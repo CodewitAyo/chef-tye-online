@@ -15,7 +15,7 @@ type Msg = {
 const GREETING: Msg = {
   role: "assistant",
   content:
-    "Hey — I'm Chef Tye's website assistant. Ask me about the menu, loyalty & rewards, ordering, Feed The Streets, or your account.",
+    "Hey — I'm Superstar, Chef Tye's website assistant. Ask me about the menu, loyalty & rewards, ordering, Feed The Streets, or your account.",
   actions: [
     { label: "See Menu", to: "/menu" },
     { label: "Loyalty", to: "/join" },
@@ -106,7 +106,7 @@ export function Chatbot() {
               <ChefHat size={16} />
             </div>
             <div className="min-w-0 leading-tight">
-              <div className="text-sm font-black uppercase tracking-widest">Chef Tye Assistant</div>
+              <div className="text-sm font-black uppercase tracking-widest">Superstar</div>
               <div className="text-[10px] uppercase tracking-widest text-cream/60">Online · Ask me anything</div>
             </div>
           </div>

@@ -9,8 +9,8 @@ import portraitAsset from "@/assets/chef-utensils.png.asset.json";
 import round2Asset from "@/assets/round-2.png.asset.json";
 import superstarAsset from "@/assets/superstar-meal.png.asset.json";
 import meal2Asset from "@/assets/meal-2.png.asset.json";
-import packagingAsset from "@/assets/packaging.png.asset.json";
 import chowdeckAsset from "@/assets/chowdeck.png.asset.json";
+import lustAsset from "@/assets/lust.png.asset.json";
 import { ORDER_URL, INSTAGRAM_PRIMARY, INSTAGRAM_HANDLE_PRIMARY, MAPS_URL } from "@/lib/constants";
 
 export const Route = createFileRoute("/")({
@@ -29,7 +29,7 @@ const carouselSlides = [
   { src: meal2Asset.url, alt: "Chef Tye Holy Grail pasta", label: "Holy Grail Pasta", tag: "Signature" },
   { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", tag: "Fan Favourite" },
   { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "There'll Be Round 2", tag: "The Promise" },
-  { src: packagingAsset.url, alt: "Chef Tye signed & sealed packaging", label: "Signed & Sealed", tag: "Every Order" },
+  { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", tag: "Potato Stir-Fry" },
   { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck", tag: "Order Online" },
 ];
 
@@ -208,7 +208,7 @@ function HomePage() {
               { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP" },
               { src: meal2Asset.url, alt: "Holy Grail pasta", label: "Holy Grail" },
               { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef" },
-              { src: packagingAsset.url, alt: "Chef Tye branded takeout boxes", label: "Signed & Sealed" },
+              { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust" },
               { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "Round 2" },
               { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck" },
             ].map((it) => (

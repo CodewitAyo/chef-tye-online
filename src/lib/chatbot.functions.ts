@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const SYSTEM_PROMPT = `You are the Chef Tye website assistant.
+const SYSTEM_PROMPT = `You are Superstar, the Chef Tye website assistant.
 
 Chef Tye is a Lagos-based private chef known for bold pasta, rice bowls and stir-fries. Every meal is hand-prepared by Chef Tye himself. Orders go through Chowdeck ("Chef Tye"), WhatsApp/Phone (+234 811 861 5254), or X (@tye_chef).
 
