@@ -84,7 +84,7 @@ export const INTENTS: Intent[] = [
     id: "help",
     match: /^(hi|hello|hey|help|start|what can you do)/i,
     answer:
-      "Hey! I'm Chef Tye's assistant. Ask me about the menu, ordering, loyalty & rewards, Feed The Streets, contact/catering, or your account.",
+      "Hey! I'm Superstar, Chef Tye's assistant. Ask me about the menu, ordering, loyalty & rewards, Feed The Streets, contact/catering, or your account.",
     actions: [
       { label: "See Menu", to: "/menu" },
       { label: "Loyalty", to: "/join" },

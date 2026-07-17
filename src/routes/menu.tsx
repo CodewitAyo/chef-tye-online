@@ -3,6 +3,8 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { ShoppingBag, Flame, Star } from "lucide-react";
 import superstarAsset from "@/assets/superstar-meal.png.asset.json";
 import meal2Asset from "@/assets/meal-2.png.asset.json";
+import lustAsset from "@/assets/lust.png.asset.json";
+import menuFlyerAsset from "@/assets/menu-flyer.png.asset.json";
 import { ORDER_URL } from "@/lib/constants";
 
 export const Route = createFileRoute("/menu")({
@@ -56,7 +58,7 @@ function MenuPage() {
             EAT WELL. <span className="text-brand">RUN IT BACK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Prices in Nigerian Naira. Available for delivery on Chowdeck ("Chef Tye") and direct order for catering. Menu updates from time to time. DM for daily specials.
+            Prices in Nigerian Naira. Available for delivery on Chowdeck Chef Tye and direct order for catering. Menu updates from time to time. DM for daily specials.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-xs font-black uppercase tracking-widest text-brand-foreground">
             <Flame size={14} /> Every meal hand-prepared by Chef Tye himself
@@ -75,6 +77,10 @@ function MenuPage() {
             desc: "The plate that built the name. Stir-fry pasta, chicken, unfair amounts of flavour." },
           { img: superstarAsset.url, title: "ASAP", price: "₦8,000", tag: "Fan Favourite",
             desc: "Chef Tye's asun-style goat pasta — smoky, spicy, unforgettable." },
+          { img: lustAsset.url, title: "Lust", price: "₦6,000", tag: "Comfort Plate",
+            desc: "Chef Tye's chicken potato stir-fry with sweet potato, veggies, and house sauce." },
+          { img: menuFlyerAsset.url, title: "Full Menu", price: "", tag: "Menu Flyer",
+            desc: "The uploaded Chef Tye menu image with the full pasta, mains, and add-ons list." },
         ].map((c) => (
           <article key={c.title} className="card-lift group relative overflow-hidden rounded-3xl bg-card shadow-sm ring-1 ring-border">
             <div className="aspect-[16/10] w-full overflow-hidden">
