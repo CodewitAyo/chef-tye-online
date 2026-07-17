@@ -162,9 +162,10 @@ function ContactPage() {
                 <a href={`tel:${CONTACT_PHONE_TEL}`} className="hover:text-brand">{CONTACT_PHONE_DISPLAY}</a>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-xs font-bold text-brand">WA</span>
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-brand">WhatsApp Chef Tye</a>
+                <WhatsappIcon size={16} className="mt-0.5 shrink-0 text-brand" />
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-brand">{WHATSAPP_DISPLAY}</a>
               </li>
+
               <li className="flex items-start gap-3">
                 <Mail size={16} className="mt-0.5 shrink-0 text-brand" />
                 <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-brand">{CONTACT_EMAIL}</a>
