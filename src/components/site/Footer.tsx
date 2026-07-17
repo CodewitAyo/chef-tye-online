@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Phone, Mail, MapPin, Bike } from "lucide-react";
 import logoAsset from "@/assets/chef-tye-logo.png.asset.json";
 import andominusAsset from "@/assets/andominus-logo.png.asset.json";
+import { WhatsappIcon } from "@/components/site/WhatsappIcon";
 import {
   ORDER_URL,
   INSTAGRAM_PRIMARY,
@@ -11,10 +12,12 @@ import {
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_TEL,
   WHATSAPP_URL,
+  WHATSAPP_DISPLAY,
   CONTACT_EMAIL,
   LOCATION,
   MAPS_URL,
 } from "@/lib/constants";
+
 
 export function Footer() {
   return (
@@ -64,9 +67,10 @@ export function Footer() {
             <li className="flex items-center gap-2">
               <Bike size={14} className="text-brand" />
               <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="text-cream/80 transition-colors hover:text-brand">
-                Chowdeck — "Chef Tye"
+                Chowdeck — Chef Tye
               </a>
             </li>
+
             <li className="flex items-center gap-2">
               <Instagram size={14} className="text-brand" />
               <a href={INSTAGRAM_PRIMARY} target="_blank" rel="noopener noreferrer" className="text-cream/80 transition-colors hover:text-brand">
@@ -92,11 +96,12 @@ export function Footer() {
               </a>
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-brand text-xs font-bold">WA</span>
+              <WhatsappIcon size={14} className="text-brand" />
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-cream/80 transition-colors hover:text-brand">
-                WhatsApp Chef Tye
+                {WHATSAPP_DISPLAY}
               </a>
             </li>
+
             <li className="flex items-center gap-2">
               <Mail size={14} className="text-brand" />
               <a href={`mailto:${CONTACT_EMAIL}`} className="text-cream/80 transition-colors hover:text-brand">

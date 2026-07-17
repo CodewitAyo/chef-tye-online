@@ -27,12 +27,25 @@ function createSupabaseClient() {
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ['VITE_SUPABASE_URL'] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ['VITE_SUPABASE_PUBLISHABLE_KEY'] : []),
-    ];
-    throw new Error(`Missing Supabase env var(s): ${missing.join(', ')}`);
+    // Return a safe stub so the UI still renders when env vars aren't configured yet.
+    return {
+      auth: {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        getUser: async () => ({ data: { user: null }, error: null }),
+        onAuthStateChange: (_cb: unknown) => ({ data: { subscription: { unsubscribe() {} } } }),
+        signInWithPassword: async () => ({ data: null, error: new Error('Supabase not configured') }),
+        signUp: async () => ({ data: null, error: new Error('Supabase not configured') }),
+        signOut: async () => ({ error: null }),
+        resetPasswordForEmail: async () => ({ data: null, error: new Error('Supabase not configured') }),
+        updateUser: async () => ({ data: null, error: new Error('Supabase not configured') }),
+      },
+      from: () => ({
+        select: () => ({ data: [], error: null }),
+        insert: () => ({ data: null, error: new Error('Supabase not configured') }),
+      }),
+    } as unknown as ReturnType<typeof createClient<Database>>;
   }
+
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: { fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY) },
