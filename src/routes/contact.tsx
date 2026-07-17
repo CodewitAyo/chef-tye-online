@@ -12,8 +12,10 @@ import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL,
   INSTAGRAM_HANDLE_PRIMARY, INSTAGRAM_PRIMARY, X_HANDLE_PRIMARY, X_PRIMARY,
-  WHATSAPP_URL, LOCATION,
+  WHATSAPP_URL, WHATSAPP_DISPLAY, LOCATION,
 } from "@/lib/constants";
+import { WhatsappIcon } from "@/components/site/WhatsappIcon";
+
 
 const searchSchema = z.object({
   type: z.enum(["contact", "donation", "catering"]).optional(),
