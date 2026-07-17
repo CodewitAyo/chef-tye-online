@@ -9,7 +9,6 @@ import portraitAsset from "@/assets/chef-utensils.png.asset.json";
 import round2Asset from "@/assets/round-2.png.asset.json";
 import superstarAsset from "@/assets/superstar-meal.png.asset.json";
 import meal2Asset from "@/assets/meal-2.png.asset.json";
-import packagingAsset from "@/assets/packaging.png.asset.json";
 import chowdeckAsset from "@/assets/chowdeck.png.asset.json";
 import lustAsset from "@/assets/lust.png.asset.json";
 import { ORDER_URL, INSTAGRAM_PRIMARY, INSTAGRAM_HANDLE_PRIMARY, MAPS_URL } from "@/lib/constants";
