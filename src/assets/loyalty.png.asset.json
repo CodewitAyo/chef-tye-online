@@ -1,11 +1,11 @@
 {
-  "asset_id": "eb03b331-864d-4296-9235-16da9c376469",
-  "content_type": "image/png",
-  "created_at": "2026-07-08T11:11:07Z",
+  "version": 1,
+  "asset_id": "f75dea5c-17da-4450-9cbe-4dfdf845a994",
+  "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
+  "url": "/__l5e/assets-v1/f75dea5c-17da-4450-9cbe-4dfdf845a994/loyalty.png",
+  "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/f75dea5c-17da-4450-9cbe-4dfdf845a994/loyalty.png",
   "original_filename": "loyalty.png",
-  "project_id": "e305ccf6-2d7a-4331-8858-7b7e415650fb",
-  "r2_key": "a/v1/e305ccf6-2d7a-4331-8858-7b7e415650fb/eb03b331-864d-4296-9235-16da9c376469/loyalty.png",
   "size": 327383,
-  "url": "/__l5e/assets-v1/eb03b331-864d-4296-9235-16da9c376469/loyalty.png",
-  "version": 1
+  "content_type": "image/png",
+  "created_at": "2026-07-17T01:31:58Z"
 }

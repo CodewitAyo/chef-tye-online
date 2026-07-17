@@ -1,11 +1,11 @@
 {
-  "asset_id": "235c3717-8801-49ec-ba2a-fd5d6e8421d1",
-  "content_type": "image/png",
-  "created_at": "2026-07-08T11:11:08Z",
+  "version": 1,
+  "asset_id": "b565e1bc-b83e-44b8-a731-1b2ea3e6c0c5",
+  "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
+  "url": "/__l5e/assets-v1/b565e1bc-b83e-44b8-a731-1b2ea3e6c0c5/menu-flyer.png",
+  "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/b565e1bc-b83e-44b8-a731-1b2ea3e6c0c5/menu-flyer.png",
   "original_filename": "menu-flyer.png",
-  "project_id": "e305ccf6-2d7a-4331-8858-7b7e415650fb",
-  "r2_key": "a/v1/e305ccf6-2d7a-4331-8858-7b7e415650fb/235c3717-8801-49ec-ba2a-fd5d6e8421d1/menu-flyer.png",
-  "size": 458781,
-  "url": "/__l5e/assets-v1/235c3717-8801-49ec-ba2a-fd5d6e8421d1/menu-flyer.png",
-  "version": 1
+  "size": 345658,
+  "content_type": "image/png",
+  "created_at": "2026-07-17T01:32:03Z"
 }
