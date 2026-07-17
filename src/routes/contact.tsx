@@ -12,8 +12,10 @@ import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL,
   INSTAGRAM_HANDLE_PRIMARY, INSTAGRAM_PRIMARY, X_HANDLE_PRIMARY, X_PRIMARY,
-  WHATSAPP_URL, LOCATION,
+  WHATSAPP_URL, WHATSAPP_DISPLAY, LOCATION,
 } from "@/lib/constants";
+import { WhatsappIcon } from "@/components/site/WhatsappIcon";
+
 
 const searchSchema = z.object({
   type: z.enum(["contact", "donation", "catering"]).optional(),
@@ -162,9 +164,10 @@ function ContactPage() {
                 <a href={`tel:${CONTACT_PHONE_TEL}`} className="hover:text-brand">{CONTACT_PHONE_DISPLAY}</a>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-xs font-bold text-brand">WA</span>
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-brand">WhatsApp Chef Tye</a>
+                <WhatsappIcon size={16} className="mt-0.5 shrink-0 text-brand" />
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-brand">{WHATSAPP_DISPLAY}</a>
               </li>
+
               <li className="flex items-start gap-3">
                 <Mail size={16} className="mt-0.5 shrink-0 text-brand" />
                 <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-brand">{CONTACT_EMAIL}</a>
