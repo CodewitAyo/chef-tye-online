@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
       { title: "Chef Tye — Private Chef in Lagos" },
       { name: "description", content: "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
       { property: "og:title", content: "Chef Tye — Private Chef in Lagos" },
-      { property: "og:description", content: "Holy Grail pasta, ASAP, Obiageli and more. Every plate hand-prepared by Chef Tye." },
+      { property: "og:description", content: "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
     ],
   }),
   component: HomePage,

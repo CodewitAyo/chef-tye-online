@@ -64,20 +64,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Chef Tye — Private Chef in Lagos | Thank You Earth" },
+      { title: "Chef Tye — Private Chef in Lagos" },
       {
         name: "description",
         content:
-          "Chef Tye is a Lagos-based private chef serving bold pasta, rice bowls and stir-fries. Order on Chowdeck, book catering, and support the Feed The Streets charity.",
+          "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets.",
       },
       { name: "theme-color", content: "#E63946" },
       { property: "og:title", content: "Chef Tye — Private Chef in Lagos" },
       {
         property: "og:description",
-        content: "Signature Holy Grail pasta, ASAP, Obiageli and more — cooked with soul in Lagos.",
+        content: "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Chef Tye — Private Chef in Lagos" },
+      { name: "twitter:description", content: "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c746a49-25f3-4fbb-9b64-cd42b3435f65" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c746a49-25f3-4fbb-9b64-cd42b3435f65" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
