@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { Heart, Users, Gift, Sparkles, ArrowRight } from "lucide-react";
+import { Heart, Users, Gift, Sparkles, ArrowRight, Calendar, MapPin, Utensils, HandHeart } from "lucide-react";
 import loyaltyAsset from "@/assets/loyalty.png.asset.json";
 import round2Asset from "@/assets/round-2.png.asset.json";
 
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/charity")({
   head: () => ({
     meta: [
       { title: "Feed The Streets Campaign — Chef Tye Charity" },
-      { name: "description", content: "Every December, Chef Tye's Feed The Streets Campaign serves free meals to vulnerable and impoverished children across Lagos." },
+      { name: "description", content: "Every December, Chef Tye's Feed The Streets Campaign serves free hot meals to vulnerable and impoverished children across Lagos. Learn how to donate, volunteer, or sponsor a feeding day." },
       { property: "og:title", content: "Feed The Streets — Chef Tye" },
       { property: "og:description", content: "Chef Tye's annual charity feeding vulnerable children across Lagos every December." },
     ],
@@ -29,14 +29,14 @@ function CharityPage() {
           </div>
           <h1 className="mt-5 max-w-4xl text-display text-6xl leading-[0.9] sm:text-7xl md:text-[7rem]">FEED THE STREETS CAMPAIGN</h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-90">
-            One month, one mission. Hot, home-cooked meals for vulnerable and impoverished children across Lagos.
+            One month. One mission. Hot, home-cooked meals for vulnerable and impoverished children across Lagos, cooked by the same hands that cook everything else on this menu.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#donate" className="rounded-full bg-charcoal px-7 py-3.5 text-sm font-black uppercase tracking-widest text-cream shadow-lg transition-all hover:-translate-y-0.5 hover:bg-charcoal/90">
               <Heart className="mr-2 inline" size={14} /> Donate Now
             </a>
             <Link to="/contact" className="btn-ghost-cream" style={{ borderColor: "var(--charcoal)", color: "var(--charcoal)" }}>
-              Volunteer / Partner
+              Volunteer or Partner
             </Link>
           </div>
         </div>
@@ -47,7 +47,7 @@ function CharityPage() {
           {[
             { icon: Users, k: "500+", v: "Kids fed each December" },
             { icon: Gift, k: "1", v: "Hot meal per plate, no shortcuts" },
-            { icon: Sparkles, k: "100%", v: "Cooked by Chef Tye's kitchen" },
+            { icon: Sparkles, k: "100%", v: "Cooked in Chef Tye's kitchen" },
           ].map((s) => (
             <div key={s.v} className="card-lift rounded-2xl border-2 border-charcoal bg-card p-6 text-center">
               <s.icon className="mx-auto text-brand" size={28} />
@@ -66,8 +66,74 @@ function CharityPage() {
           <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Why We Do It</div>
           <h2 className="mt-2 text-display text-5xl">A plate is a promise.</h2>
           <p className="mt-5 text-lg leading-relaxed text-foreground/85">
-            Chef Tye grew up understanding that a warm meal is more than calories. It's dignity, safety, a little bit of joy in a hard week.
+            Chef Tye grew up understanding that a warm meal is more than calories. It's dignity, safety, a little bit of joy in a hard week. This campaign started because one December he saw a kid stretch a single meal across a whole day, and decided that wasn't happening on his watch again.
           </p>
+          <p className="mt-4 text-lg leading-relaxed text-foreground/85">
+            Feed The Streets isn't a photo-op. It's the same kitchen, the same ingredients, the same care that goes into every paying customer's plate, going out for free to kids who need it most.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-cream/60 py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">How It Works</div>
+          <h2 className="mt-2 text-display text-5xl">From your donation to their plate.</h2>
+
+          <ol className="mt-8 grid gap-5 md:grid-cols-4">
+            {[
+              { icon: HandHeart, n: "1", t: "You pledge", d: "Pick an amount or a preset. You get transfer details by email within a day." },
+              { icon: Utensils, n: "2", t: "We shop and cook", d: "100% of donations go to ingredients, packaging and fuel. No overheads, no salaries." },
+              { icon: MapPin, n: "3", t: "We drive out", d: "Every December week we hit different neighbourhoods across Lagos with hot food." },
+              { icon: Calendar, n: "4", t: "You see it", d: "We send updates, photos and totals so you know exactly what your money did." },
+            ].map((s) => (
+              <li key={s.n} className="rounded-3xl border-2 border-charcoal bg-card p-6">
+                <s.icon size={22} className="text-brand" />
+                <div className="mt-3 text-display text-5xl text-brand">{s.n}</div>
+                <div className="mt-1 text-display text-2xl">{s.t}</div>
+                <p className="mt-2 text-sm text-muted-foreground">{s.d}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Where Your Money Actually Goes</div>
+        <h2 className="mt-2 text-display text-5xl">Small amount. Real impact.</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          {[
+            { amt: "₦1,000", d: "One hot meal for one child. Rice, protein, sauce, love." },
+            { amt: "₦5,000", d: "Feeds a family of five in one sitting, or five kids on the street." },
+            { amt: "₦15,000", d: "Sponsors a full mini-run: 15 meals plus packaging and transport." },
+            { amt: "₦50,000", d: "Underwrites a whole feeding day for a neighbourhood in Lagos." },
+          ].map((b) => (
+            <div key={b.amt} className="rounded-2xl border-2 border-charcoal bg-card p-5">
+              <div className="text-display text-3xl text-brand">{b.amt}</div>
+              <p className="mt-2 text-sm text-foreground/80">{b.d}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          Every naira goes to food and getting it out. Chef Tye covers the labour himself, every year, no exceptions.
+        </p>
+      </section>
+
+      <section className="bg-charcoal text-cream">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+          <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Straight From The Streets</div>
+          <h2 className="mt-2 text-display text-5xl">Why it matters, in their words.</h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {[
+              { q: "It was the first proper meal I had that week. I still remember the pasta.", a: "12 y/o, Yaba" },
+              { q: "My little brother didn't stop smiling. That's the whole point for me.", a: "Volunteer, 2024 run" },
+              { q: "Chef Tye came himself. Served us. That's not normal.", a: "16 y/o, Surulere" },
+            ].map((t) => (
+              <figure key={t.a} className="rounded-2xl bg-cream/5 p-6 ring-1 ring-cream/10">
+                <blockquote className="text-lg leading-relaxed text-cream/90">"{t.q}"</blockquote>
+                <figcaption className="mt-3 text-xs font-bold uppercase tracking-widest text-brand">— {t.a}</figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -77,7 +143,7 @@ function CharityPage() {
             <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Donate</div>
             <h2 className="mt-2 text-display text-5xl sm:text-6xl">Feed a child. Fuel the mission.</h2>
             <p className="mx-auto mt-4 max-w-2xl text-cream/80">
-              Pick a plate, or write your own amount. 100% of donations go toward ingredients, packaging, and getting hot food into kids' hands this December.
+              Pick a plate, or set your own amount. Every naira goes toward ingredients, packaging, and getting hot food into kids' hands this December.
             </p>
           </div>
 
@@ -111,6 +177,28 @@ function CharityPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-5xl px-5 py-16 sm:px-8">
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">More Than Money</div>
+        <h2 className="mt-2 text-display text-5xl">Other ways you can help.</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border-2 border-charcoal bg-card p-6">
+            <div className="text-display text-2xl">Volunteer a day</div>
+            <p className="mt-2 text-sm text-muted-foreground">Help pack, drive, or serve on a feeding day. Lagos residents only.</p>
+            <Link to="/contact" className="btn-outline mt-4 inline-flex">Sign up</Link>
+          </div>
+          <div className="rounded-2xl border-2 border-charcoal bg-card p-6">
+            <div className="text-display text-2xl">Sponsor a day</div>
+            <p className="mt-2 text-sm text-muted-foreground">Brands and businesses can underwrite a full neighbourhood run and get proper coverage.</p>
+            <Link to="/contact" className="btn-outline mt-4 inline-flex">Partner with us</Link>
+          </div>
+          <div className="rounded-2xl border-2 border-charcoal bg-card p-6">
+            <div className="text-display text-2xl">Send supplies</div>
+            <p className="mt-2 text-sm text-muted-foreground">In-kind donations of rice, oil, packaging or vehicles work just as well as cash.</p>
+            <Link to="/contact" className="btn-outline mt-4 inline-flex">Get in touch</Link>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-20 sm:px-8 md:grid-cols-[1fr_1fr]">
         <div className="overflow-hidden rounded-3xl bg-charcoal p-2">
           <img src={loyaltyAsset.url} alt="Chef Tye Loyalty & Rewards Program" className="w-full rounded-2xl object-cover" />
@@ -119,10 +207,10 @@ function CharityPage() {
           <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">While you're here</div>
           <h2 className="mt-2 text-display text-5xl">Every order earns points.</h2>
           <p className="mt-4 text-lg leading-relaxed text-foreground/85">
-            Chef Tye's Loyalty &amp; Rewards Program stacks a point for every ₦1,000 spent. From free plantain and drinks to VIP perks and a year-end top-customer prize.
+            Chef Tye's Loyalty and Rewards Program adds a point for every ₦1,000 you spend. Free plantain and drinks to start, VIP perks as you climb, and a year-end prize for our biggest supporters.
           </p>
           <ul className="mt-6 space-y-3 text-sm text-foreground/85">
-            <li><span className="font-bold text-brand">Member (0–99 pts):</span> Free plantain, drinks & discounts.</li>
+            <li><span className="font-bold text-brand">Member (0–99 pts):</span> Free plantain, drinks and member discounts.</li>
             <li><span className="font-bold text-brand">VIP (100–199 pts):</span> Free main meals, birthday gift, priority orders.</li>
             <li><span className="font-bold text-brand">Elite Circle (200+ pts):</span> Custom meal requests, exclusive invites, end-of-year prize.</li>
           </ul>
