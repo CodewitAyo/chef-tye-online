@@ -15,8 +15,8 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign In / Join The Family — Chef Tye" },
-      { name: "description", content: "Sign in to your Chef Tye family account, track loyalty points and unlock perks." },
+      { title: "Sign In / Join The Elites — Chef Tye" },
+      { name: "description", content: "Sign in to your Chef Tye elites account, track loyalty points and unlock perks." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -90,7 +90,7 @@ function AuthPage() {
     }
   }
 
-  const headline = mode === "signup" ? "Join the family." : mode === "forgot" ? "Reset your password." : "Welcome back.";
+  const headline = mode === "signup" ? "Join the elites." : mode === "forgot" ? "Reset your password." : "Welcome back.";
 
   return (
     <SiteLayout>
@@ -98,7 +98,7 @@ function AuthPage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-5 sm:px-8 md:grid-cols-[1.1fr_1fr] md:items-center">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-cream/80">
-              <Sparkles size={14} className="text-brand" /> Chef Tye Family
+              <Sparkles size={14} className="text-brand" /> Chef Tye Elites
             </div>
             <h1 className="mt-5 text-display text-6xl leading-[0.9] sm:text-7xl">{headline}</h1>
             <p className="mt-5 max-w-lg text-lg text-cream/80">

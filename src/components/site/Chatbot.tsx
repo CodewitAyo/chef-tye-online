@@ -94,7 +94,7 @@ export function Chatbot() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : "Open chat"}
-        className="fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-brand text-brand-foreground shadow-2xl ring-2 ring-cream/40 transition-transform hover:scale-105"
+        className="fixed bottom-5 right-5 z-40 grid h-14 w-14 cursor-pointer place-items-center rounded-full bg-brand text-brand-foreground shadow-2xl ring-2 ring-cream/40 transition-transform hover:scale-105"
       >
         {open ? <X size={22} /> : <MessageSquare size={22} />}
       </button>

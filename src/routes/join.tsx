@@ -6,9 +6,9 @@ import loyaltyAsset from "@/assets/loyalty.png.asset.json";
 export const Route = createFileRoute("/join")({
   head: () => ({
     meta: [
-      { title: "Join The Chef Tye Family — Loyalty & Rewards" },
-      { name: "description", content: "Join the Chef Tye family. Earn 1 point per ₦1,000, unlock free sides, VIP perks and end-of-year prizes." },
-      { property: "og:title", content: "Join The Chef Tye Family" },
+      { title: "Join The Chef Tye Elites — Loyalty & Rewards" },
+      { name: "description", content: "Join the Chef Tye elites. Earn 1 point per ₦1,000, unlock free sides, VIP perks and end-of-year prizes." },
+      { property: "og:title", content: "Join The Chef Tye Elites" },
       { property: "og:description", content: "Chef Tye's loyalty & rewards program. 1 point per ₦1,000 spent, tiers with real perks." },
     ],
   }),
@@ -34,7 +34,7 @@ function JoinPage() {
               <Sparkles size={14} className="text-brand" /> Loyalty & Rewards
             </div>
             <h1 className="mt-5 text-display text-6xl leading-[0.9] sm:text-7xl md:text-[6.5rem]">
-              JOIN THE <span className="text-brand">FAMILY.</span>
+              JOIN THE <span className="text-brand">ELITES.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-cream/80">
               One free account. Earn <span className="font-bold text-brand">1 point for every ₦1,000</span> you spend with Chef Tye.
@@ -47,7 +47,7 @@ function JoinPage() {
                 Create Free Account <ArrowRight size={16} />
               </Link>
               <Link to="/auth" search={{ mode: "signin", next: "/account" }} className="btn-ghost-cream">
-                Already family? Sign in
+                Already elite? Sign in
               </Link>
             </div>
           </div>
@@ -99,7 +99,7 @@ function JoinPage() {
           </ol>
           <div className="mt-10 text-center">
             <Link to="/auth" search={{ mode: "signup", next: "/account" }} className="btn-primary">
-              Join The Family — Free <ArrowRight size={16} />
+              Join The Elites — Free <ArrowRight size={16} />
             </Link>
           </div>
         </div>

@@ -122,7 +122,7 @@ function AccountPage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-cream/80">
-                <Sparkles size={14} className="text-brand" /> Chef Tye Family
+                <Sparkles size={14} className="text-brand" /> Chef Tye Elites
               </div>
               <h1 className="mt-4 text-display text-5xl leading-tight sm:text-6xl">
                 Hey, {displayName || fullName || email.split("@")[0]}.

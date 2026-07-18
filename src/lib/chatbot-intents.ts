@@ -32,9 +32,9 @@ export const INTENTS: Intent[] = [
     id: "loyalty",
     match: /\b(loyalty|points?|rewards?|earn|tier|vip|elite)\b/i,
     answer:
-      "Chef Tye Family loyalty: earn 1 point per ₦1,000 spent (subtotal only).\n\n• Member (0–99): free plantain/drink, ₦3,000 off at 60 pts.\n• VIP (100–199): free main meal, birthday gift, priority orders.\n• Elite Circle (200+): 10% off, custom meal requests, end-of-year prize.",
+      "Chef Tye Elites loyalty: earn 1 point per ₦1,000 spent (subtotal only).\n\n• Member (0–99): free plantain/drink, ₦3,000 off at 60 pts.\n• VIP (100–199): free main meal, birthday gift, priority orders.\n• Elite Circle (200+): 10% off, custom meal requests, end-of-year prize.",
     actions: [
-      { label: "Join The Family", to: "/join" },
+      { label: "Join The Elites", to: "/join" },
       { label: "Create Account", to: "/auth" },
     ],
   },
