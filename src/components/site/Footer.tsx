@@ -48,7 +48,7 @@ export function Footer() {
             {[
               { to: "/story", label: "The Story" },
               { to: "/menu", label: "The Menu" },
-              { to: "/join", label: "Join The Family" },
+              { to: "/join", label: "Join The Elites" },
               { to: "/charity", label: "Feed The Streets" },
               { to: "/contact", label: "Contact & Catering" },
             ].map((l) => (

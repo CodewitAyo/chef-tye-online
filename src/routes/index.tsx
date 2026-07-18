@@ -178,7 +178,7 @@ function HomePage() {
               <Users size={14} /> Loyalty & Rewards
             </div>
             <h2 className="mt-3 text-display text-5xl leading-[0.95] sm:text-6xl">
-              Join the family — <span className="text-brand">earn on every plate</span>.
+              Join the elites — <span className="text-brand">earn on every plate</span>.
             </h2>
             <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
               Create a free Chef Tye account and earn <strong>1 point per ₦1,000</strong> you spend. Unlock free sides, VIP perks, and a year-end prize.
