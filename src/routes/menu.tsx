@@ -27,7 +27,7 @@ const sections: Section[] = [
     title: "Chef Tye Pasta",
     items: [
       { name: "Holy Grail", price: "₦5,700", desc: "Chef Tye's signature stir-fry pasta with chicken.", tag: "Signature" },
-      { name: "Holy Grail Pro", price: "₦6,700", desc: "Stir-fry pasta with shredded chicken plus a full piece of chicken." },
+      { name: "Holy Grail Pro", price: "₦6,700", desc: "Chef Tye's signature stir-fry pasta upgraded with more chicken!" },
       { name: "ASAP", price: "₦8,000", desc: "Chef Tye's goat-meat pasta, asun-style. Bold, smoky, spicy." },
       { name: "Obiageli", price: "₦6,500", desc: "Native pasta with smoked fish, egg and ponmo." },
     ],
