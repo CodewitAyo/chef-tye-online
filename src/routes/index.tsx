@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight, Instagram, ShoppingBag, Heart, Star, ChefHat, MapPin, Users,
 } from "lucide-react";
@@ -17,23 +17,32 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Chef Tye — Private Chef in Lagos" },
-      { name: "description", content: "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
+      { name: "description", content: "Chef Tye is a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
       { property: "og:title", content: "Chef Tye — Private Chef in Lagos" },
-      { property: "og:description", content: "Chef Tye, a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
+      { property: "og:description", content: "Chef Tye is a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
     ],
   }),
   component: HomePage,
 });
 
-const carouselSlides = [
-  { src: meal2Asset.url, alt: "Chef Tye Holy Grail pasta", label: "Holy Grail Pasta", tag: "Signature" },
-  { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", tag: "Fan Favourite" },
+type Slide = {
+  src: string;
+  alt: string;
+  label: string;
+  tag: string;
+  itemId?: string;
+};
+
+const carouselSlides: Slide[] = [
+  { src: meal2Asset.url, alt: "Chef Tye Holy Grail pasta", label: "Holy Grail Pasta", tag: "Signature", itemId: "holy-grail" },
+  { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", tag: "Fan Favourite", itemId: "asap" },
   { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "There'll Be Round 2", tag: "The Promise" },
-  { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", tag: "Potato Stir-Fry" },
+  { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", tag: "Potato Stir-Fry", itemId: "lust" },
   { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck", tag: "Order Online" },
 ];
 
 function MealCarousel() {
+  const navigate = useNavigate();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selected, setSelected] = useState(0);
 
@@ -52,19 +61,37 @@ function MealCarousel() {
     <div className="relative">
       <div className="overflow-hidden rounded-3xl bg-charcoal shadow-2xl" ref={emblaRef}>
         <div className="flex">
-          {carouselSlides.map((s) => (
-            <div key={s.label} className="relative min-w-0 flex-[0_0_100%]">
-              <div className="aspect-[3/4] w-full overflow-hidden">
-                <img src={s.src} alt={s.alt} className="h-full w-full object-cover" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/60 to-transparent p-5 text-cream">
-                <div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-brand">{s.tag}</div>
-                  <div className="text-display text-2xl leading-tight">{s.label}</div>
+          {carouselSlides.map((s) => {
+            const inner = (
+              <>
+                <div className="aspect-[3/4] w-full overflow-hidden">
+                  <img src={s.src} alt={s.alt} className="h-full w-full object-cover" />
                 </div>
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/60 to-transparent p-5 text-cream">
+                  <div>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-brand">{s.tag}</div>
+                    <div className="text-display text-2xl leading-tight">{s.label}</div>
+                  </div>
+                </div>
+              </>
+            );
+            return (
+              <div key={s.label} className="relative min-w-0 flex-[0_0_100%]">
+                {s.itemId ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate({ to: "/menu", search: { item: s.itemId } })}
+                    className="relative block h-full w-full cursor-pointer text-left"
+                    aria-label={`See ${s.label} on the menu`}
+                  >
+                    {inner}
+                  </button>
+                ) : (
+                  <div className="relative">{inner}</div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       <div className="mt-4 flex items-center justify-center gap-2">
@@ -73,7 +100,7 @@ function MealCarousel() {
             key={i}
             onClick={() => scrollTo(i)}
             aria-label={`Show slide ${i + 1}`}
-            className={`h-2 rounded-full transition-all ${selected === i ? "w-8 bg-brand" : "w-2 bg-cream/40 hover:bg-cream/70"}`}
+            className={`h-2 cursor-pointer rounded-full transition-all ${selected === i ? "w-8 bg-brand" : "w-2 bg-cream/40 hover:bg-cream/70"}`}
           />
         ))}
       </div>
@@ -82,6 +109,15 @@ function MealCarousel() {
 }
 
 function HomePage() {
+  const galleryItems: { src: string; alt: string; label: string; itemId?: string }[] = [
+    { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", itemId: "asap" },
+    { src: meal2Asset.url, alt: "Holy Grail pasta", label: "Holy Grail", itemId: "holy-grail" },
+    { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef" },
+    { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", itemId: "lust" },
+    { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "Round 2" },
+    { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck" },
+  ];
+
   return (
     <SiteLayout>
       <section className="relative overflow-hidden bg-charcoal text-cream">
@@ -99,8 +135,7 @@ function HomePage() {
               THERE'LL BE<br /><span className="text-brand">ROUND 2.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-cream/80">
-              I'm <span className="font-bold text-cream">Chef Tye</span>, a Lagos private chef cooking the kind of food you go back for.
-              Bold pastas, stir-fries and rice bowls, <span className="font-bold text-brand">every plate hand-prepared by me</span>.
+              I'm <span className="font-bold text-cream">Chef Tye</span>, a private chef in Lagos. I cook the kind of food you finish and immediately start planning to order again. Bold pastas, rice bowls and stir-fries, <span className="font-bold text-brand">every plate cooked by me personally</span>.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
@@ -112,7 +147,7 @@ function HomePage() {
               <div className="flex items-center gap-1 text-brand">
                 {Array.from({ length: 5 }).map((_, i) => (<Star key={i} size={16} fill="currentColor" />))}
               </div>
-              <span>Loved on Chowdeck & Instagram</span>
+              <span>Loved on Chowdeck and Instagram</span>
             </div>
           </div>
 
@@ -148,17 +183,22 @@ function HomePage() {
       </section>
 
       <section className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-20 sm:px-8 md:grid-cols-2 md:py-28">
-        <div className="relative">
+        <Link
+          to="/menu"
+          search={{ item: "holy-grail" }}
+          className="group relative cursor-pointer"
+          aria-label="See Holy Grail on the menu"
+        >
           <div className="card-lift overflow-hidden rounded-3xl">
-            <img src={meal2Asset.url} alt="Chef Tye's signature Holy Grail pasta" className="aspect-square w-full object-cover" />
+            <img src={meal2Asset.url} alt="Chef Tye's signature Holy Grail pasta" className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
           </div>
           <div className="absolute -right-4 -top-4 rounded-full bg-brand px-5 py-2 text-xs font-black uppercase tracking-widest text-brand-foreground shadow-lg sm:-right-8 sm:-top-8">Signature</div>
-        </div>
+        </Link>
         <div>
           <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">The Signature</div>
           <h2 className="mt-3 text-display text-5xl sm:text-6xl">The Holy Grail Pasta</h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            The plate that built the name. A stir-fry pasta so loud with flavour it'll make you send a voice note. Layered spices, punchy sauce, unfair amounts of love.
+            The plate that built the name. A stir-fry pasta loud enough with flavour that people send voice notes about it. Layered spices, a punchy sauce, and unreasonable amounts of love.
           </p>
           <ul className="mt-6 space-y-2 text-sm text-foreground/80">
             <li className="flex items-center gap-2"><ChefHat size={16} className="text-brand" /> Holy Grail, ₦5,700</li>
@@ -175,13 +215,13 @@ function HomePage() {
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 sm:px-8 md:grid-cols-[1.4fr_auto]">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-brand/15 px-3 py-1 text-xs font-black uppercase tracking-widest text-brand">
-              <Users size={14} /> Loyalty & Rewards
+              <Users size={14} /> Loyalty and Rewards
             </div>
             <h2 className="mt-3 text-display text-5xl leading-[0.95] sm:text-6xl">
-              Join the elites — <span className="text-brand">earn on every plate</span>.
+              Join the elites. <span className="text-brand">Earn on every plate.</span>
             </h2>
             <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              Create a free Chef Tye account and earn <strong>1 point per ₦1,000</strong> you spend. Unlock free sides, VIP perks, and a year-end prize.
+              Create a free Chef Tye account and earn <strong>1 point for every ₦1,000</strong> you spend. Free sides, VIP perks, and a year-end prize for our biggest supporters.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
@@ -204,22 +244,32 @@ function HomePage() {
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP" },
-              { src: meal2Asset.url, alt: "Holy Grail pasta", label: "Holy Grail" },
-              { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef" },
-              { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust" },
-              { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "Round 2" },
-              { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck" },
-            ].map((it) => (
-              <div key={it.label} className="group relative overflow-hidden rounded-2xl bg-charcoal">
-                <img src={it.src} alt={it.alt} className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-charcoal/90 to-transparent p-4 pt-10 text-cream">
-                  <span className="text-sm font-bold uppercase tracking-widest">{it.label}</span>
-                  <ArrowRight size={16} className="translate-x-[-6px] text-brand opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+            {galleryItems.map((it) => {
+              const inner = (
+                <>
+                  <img src={it.src} alt={it.alt} className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-charcoal/90 to-transparent p-4 pt-10 text-cream">
+                    <span className="text-sm font-bold uppercase tracking-widest">{it.label}</span>
+                    <ArrowRight size={16} className="translate-x-[-6px] text-brand opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                  </div>
+                </>
+              );
+              return it.itemId ? (
+                <Link
+                  key={it.label}
+                  to="/menu"
+                  search={{ item: it.itemId }}
+                  className="group relative block overflow-hidden rounded-2xl bg-charcoal"
+                  aria-label={`See ${it.label} on the menu`}
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <div key={it.label} className="group relative overflow-hidden rounded-2xl bg-charcoal">
+                  {inner}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -239,7 +289,7 @@ function HomePage() {
             <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">The Story</div>
             <h2 className="mt-2 text-display text-5xl sm:text-6xl">Built from the grind.</h2>
             <p className="mt-5 text-lg leading-relaxed text-cream/80">
-              Chef Tye started in a university kitchen with one goal: build something for himself and lift some weight off the family that carried him. Every meal on the menu today is still hand-prepared by him personally.
+              Chef Tye started in a university kitchen with one goal: build something for himself and lift some weight off the family that carried him. Every meal on the menu today is still cooked by him personally.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/story" className="btn-primary">Read the story <ArrowRight size={16} /></Link>
@@ -257,7 +307,7 @@ function HomePage() {
             </div>
             <h2 className="mt-4 text-display text-5xl leading-[0.95] sm:text-6xl">Feed The Streets Campaign</h2>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-brand-foreground/90">
-              Chef Tye's annual charity run. Free hot meals for vulnerable and impoverished children across Lagos. Your donation puts a plate in a small hand this December.
+              Chef Tye's annual charity drive. Free hot meals for vulnerable and impoverished children across Lagos. Your donation puts a plate in a small hand this December.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
