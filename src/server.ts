@@ -1,3 +1,4 @@
+// SSR entry — wraps the TanStack Start server-entry with error capture + normalization.
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
