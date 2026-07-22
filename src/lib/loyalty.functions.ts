@@ -35,10 +35,10 @@ export const getDashboard = createServerFn({ method: "GET" })
         .select("id, code, name, description, points_cost, tier_required, active")
         .eq("active", true)
         .order("points_cost", { ascending: true }),
-      supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
     ]);
 
-    const isAdmin = (roleRes.data ?? []).some((r) => r.role === "admin");
+    const isAdmin = roleRes.data === true;
     return {
       profile: profileRes.data,
       ledger: ledgerRes.data ?? [],
@@ -104,25 +104,20 @@ const addOrderInput = z.object({
   note: z.string().max(1000).optional(),
 });
 
-async function requireAdmin(supabase: never, userId: string) {
-  const s = supabase as unknown as {
-    from: (t: string) => {
-      select: (c: string) => {
-        eq: (col: string, val: string) => {
-          eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: unknown | null }> };
-        };
-      };
-    };
+async function requireAdmin(supabase: unknown, userId: string) {
+  const s = supabase as {
+    rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: unknown }>;
   };
-  const { data } = await s.from("user_roles").select("id").eq("user_id", userId).eq("role", "admin").maybeSingle();
-  if (!data) throw new Error("Forbidden: admin only.");
+  const { data, error } = await s.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (error) throw new Error("Admin check failed.");
+  if (data !== true) throw new Error("Forbidden: admin only.");
 }
 
 export const adminAddOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => addOrderInput.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: userList, error: uErr } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
     if (uErr) throw new Error("User lookup failed.");
@@ -169,7 +164,7 @@ export const adminAdjustPoints = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => adjustInput.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     if (data.delta === 0) throw new Error("Delta cannot be zero.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: userList } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
@@ -202,7 +197,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => honorInput.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("reward_redemptions")
@@ -228,7 +223,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const [members, pending, recentOrders, recentAudit] = await Promise.all([
