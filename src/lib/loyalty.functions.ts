@@ -104,11 +104,11 @@ const addOrderInput = z.object({
   note: z.string().max(1000).optional(),
 });
 
-async function requireAdmin(
-  supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" | "user" }) => PromiseLike<{ data: boolean | null; error: unknown }> },
-  userId: string,
-) {
-  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+async function requireAdmin(supabase: unknown, userId: string) {
+  const s = supabase as {
+    rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: unknown }>;
+  };
+  const { data, error } = await s.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error) throw new Error("Admin check failed.");
   if (data !== true) throw new Error("Forbidden: admin only.");
 }
