@@ -35,10 +35,10 @@ export const getDashboard = createServerFn({ method: "GET" })
         .select("id, code, name, description, points_cost, tier_required, active")
         .eq("active", true)
         .order("points_cost", { ascending: true }),
-      supabase.from("user_roles").select("role").eq("user_id", userId),
+      supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
     ]);
 
-    const isAdmin = (roleRes.data ?? []).some((r) => r.role === "admin");
+    const isAdmin = roleRes.data === true;
     return {
       profile: profileRes.data,
       ledger: ledgerRes.data ?? [],
