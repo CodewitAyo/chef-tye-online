@@ -104,18 +104,15 @@ const addOrderInput = z.object({
   note: z.string().max(1000).optional(),
 });
 
-async function requireAdmin(supabase: never, userId: string) {
-  const s = supabase as unknown as {
-    from: (t: string) => {
-      select: (c: string) => {
-        eq: (col: string, val: string) => {
-          eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: unknown | null }> };
-        };
-      };
-    };
-  };
-  const { data } = await s.from("user_roles").select("id").eq("user_id", userId).eq("role", "admin").maybeSingle();
-  if (!data) throw new Error("Forbidden: admin only.");
+type UserSupabase = Awaited<ReturnType<typeof import("@/integrations/supabase/auth-middleware").requireSupabaseAuth extends never ? never : never>> extends never ? never : never;
+
+async function requireAdmin(
+  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> },
+  userId: string,
+) {
+  const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (error) throw new Error("Admin check failed.");
+  if (data !== true) throw new Error("Forbidden: admin only.");
 }
 
 export const adminAddOrder = createServerFn({ method: "POST" })
