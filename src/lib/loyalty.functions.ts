@@ -104,10 +104,8 @@ const addOrderInput = z.object({
   note: z.string().max(1000).optional(),
 });
 
-type UserSupabase = Awaited<ReturnType<typeof import("@/integrations/supabase/auth-middleware").requireSupabaseAuth extends never ? never : never>> extends never ? never : never;
-
 async function requireAdmin(
-  supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> },
+  supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" | "user" }) => PromiseLike<{ data: boolean | null; error: unknown }> },
   userId: string,
 ) {
   const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
