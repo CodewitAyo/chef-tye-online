@@ -119,7 +119,7 @@ export const adminAddOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => addOrderInput.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: userList, error: uErr } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
     if (uErr) throw new Error("User lookup failed.");
@@ -166,7 +166,7 @@ export const adminAdjustPoints = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => adjustInput.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     if (data.delta === 0) throw new Error("Delta cannot be zero.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: userList } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
@@ -199,7 +199,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => honorInput.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("reward_redemptions")
@@ -225,7 +225,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.supabase as never, context.userId);
+    await requireAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const [members, pending, recentOrders, recentAudit] = await Promise.all([
