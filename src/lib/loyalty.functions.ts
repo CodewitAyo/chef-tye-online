@@ -118,17 +118,15 @@ export const adminAddOrder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => addOrderInput.parse(d))
   .handler(async ({ data, context }) => {
     await requireAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: userList, error: uErr } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    if (uErr) throw new Error("User lookup failed.");
-    const target = userList.users.find((u) => u.email?.toLowerCase() === data.userEmail.toLowerCase());
-    if (!target) throw new Error("No member found with that email.");
+    const { data: targetId, error: lookupErr } = await context.supabase.rpc("admin_user_id_by_email", { _email: data.userEmail });
+    if (lookupErr) throw new Error("User lookup failed.");
+    if (!targetId) throw new Error("No member found with that email.");
 
     const total = data.subtotalNgn + data.deliveryFeeNgn;
-    const { data: order, error: oErr } = await supabaseAdmin
+    const { data: order, error: oErr } = await context.supabase
       .from("orders")
       .insert({
-        user_id: target.id,
+        user_id: targetId as string,
         source: data.source,
         external_ref: data.externalRef ?? null,
         subtotal_ngn: data.subtotalNgn,
@@ -143,12 +141,12 @@ export const adminAddOrder = createServerFn({ method: "POST" })
       .single();
     if (oErr || !order) throw new Error("Order insert failed: " + (oErr?.message ?? ""));
 
-    await supabaseAdmin.from("audit_log").insert({
+    await context.supabase.from("audit_log").insert({
       actor_id: context.userId,
       action: "order.admin_add",
       target_table: "orders",
       target_id: order.id,
-      after: { user_id: target.id, ...data },
+      after: { user_id: targetId, ...data },
       note: data.note,
     });
     return { ok: true, orderId: order.id };
@@ -166,13 +164,12 @@ export const adminAdjustPoints = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context.supabase, context.userId);
     if (data.delta === 0) throw new Error("Delta cannot be zero.");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: userList } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    const target = userList.users.find((u) => u.email?.toLowerCase() === data.userEmail.toLowerCase());
-    if (!target) throw new Error("No member found with that email.");
+    const { data: targetId, error: lookupErr } = await context.supabase.rpc("admin_user_id_by_email", { _email: data.userEmail });
+    if (lookupErr) throw new Error("User lookup failed.");
+    if (!targetId) throw new Error("No member found with that email.");
 
-    const { error } = await supabaseAdmin.from("loyalty_points_ledger").insert({
-      user_id: target.id,
+    const { error } = await context.supabase.from("loyalty_points_ledger").insert({
+      user_id: targetId as string,
       delta: data.delta,
       reason: "adjust",
       note: data.reason,
@@ -180,11 +177,11 @@ export const adminAdjustPoints = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
 
-    await supabaseAdmin.from("audit_log").insert({
+    await context.supabase.from("audit_log").insert({
       actor_id: context.userId,
       action: "points.adjust",
       target_table: "profiles",
-      target_id: target.id,
+      target_id: targetId as string,
       after: { delta: data.delta, reason: data.reason },
       note: data.reason,
     });
@@ -198,8 +195,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => honorInput.parse(d))
   .handler(async ({ data, context }) => {
     await requireAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { error } = await context.supabase
       .from("reward_redemptions")
       .update({
         status: "honored",
@@ -210,7 +206,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
       .eq("id", data.redemptionId);
     if (error) throw new Error(error.message);
 
-    await supabaseAdmin.from("audit_log").insert({
+    await context.supabase.from("audit_log").insert({
       actor_id: context.userId,
       action: "redemption.honor",
       target_table: "reward_redemptions",
@@ -219,6 +215,7 @@ export const adminHonorRedemption = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
 
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
