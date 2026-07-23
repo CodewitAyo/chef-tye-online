@@ -66,14 +66,14 @@ export const redeemReward = createServerFn({ method: "POST" })
     const { data: profile } = await supabase.from("profiles").select("points").eq("id", userId).maybeSingle();
     if (!profile || profile.points < reward.points_cost) throw new Error("Not enough points.");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: red, error: redErr } = await supabaseAdmin
+    const { data: red, error: redErr } = await supabase
       .from("reward_redemptions")
       .insert({ user_id: userId, reward_id: reward.id, points_cost: reward.points_cost, status: "available" })
       .select("id")
       .single();
     if (redErr || !red) throw new Error("Could not create redemption.");
 
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: ledgerErr } = await supabaseAdmin.from("loyalty_points_ledger").insert({
       user_id: userId,
       delta: -reward.points_cost,
@@ -84,13 +84,14 @@ export const redeemReward = createServerFn({ method: "POST" })
     });
     if (ledgerErr) throw new Error("Points deduction failed.");
 
-    await supabaseAdmin.from("audit_log").insert({
+    await supabase.from("audit_log").insert({
       actor_id: userId,
       action: "reward.redeem",
       target_table: "reward_redemptions",
       target_id: red.id,
       after: { reward_id: reward.id, points_cost: reward.points_cost },
     });
+
     return { ok: true, redemptionId: red.id };
   });
 
