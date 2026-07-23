@@ -251,18 +251,19 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const overviewError = [members.error, pending.error, recentOrders.error, recentAudit.error].find(Boolean);
     if (overviewError) throw new Error(`Admin overview query failed: ${overviewError.message}`);
 
+    const userIds = Array.from(
+      new Set([
+        ...(members.data ?? []).map((m) => m.id),
+        ...(pending.data ?? []).map((p) => p.user_id),
+        ...(recentOrders.data ?? []).map((o) => o.user_id),
+      ]),
+    );
     let emailById = new Map<string, string>();
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: userList, error: userListError } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-        if (!userListError && userList) {
-          emailById = new Map(userList.users.map((u) => [u.id, u.email ?? ""]));
-        }
-      } catch {
-        emailById = new Map<string, string>();
-      }
+    if (userIds.length) {
+      const { data: emails } = await db.rpc("admin_emails_for_users", { _user_ids: userIds });
+      if (emails) emailById = new Map((emails as Array<{ id: string; email: string }>).map((e) => [e.id, e.email ?? ""]));
     }
+
     const membersWithEmail = (members.data ?? []).map((m) => ({ ...m, email: emailById.get(m.id) ?? "" }));
 
     const rewardsCat = await db.from("rewards_catalog").select("id, name");
