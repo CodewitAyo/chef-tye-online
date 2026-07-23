@@ -224,37 +224,51 @@ export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await requireAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const db = context.supabase;
 
     const [members, pending, recentOrders, recentAudit] = await Promise.all([
-      supabaseAdmin
+      db
         .from("profiles")
         .select("id, full_name, display_name, points, lifetime_points, highest_points, created_at")
         .order("lifetime_points", { ascending: false })
         .limit(100),
-      supabaseAdmin
+      db
         .from("reward_redemptions")
         .select("id, user_id, reward_id, points_cost, status, requested_at, note")
         .eq("status", "available")
         .order("requested_at", { ascending: false })
         .limit(50),
-      supabaseAdmin
+      db
         .from("orders")
         .select("id, user_id, source, subtotal_ngn, total_ngn, occurred_at, status, note")
         .order("occurred_at", { ascending: false })
         .limit(30),
-      supabaseAdmin
+      db
         .from("audit_log")
         .select("id, actor_id, action, target_table, target_id, note, created_at")
         .order("created_at", { ascending: false })
         .limit(30),
     ]);
 
-    const { data: userList } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    const emailById = new Map(userList.users.map((u) => [u.id, u.email ?? ""]));
+    const overviewError = [members.error, pending.error, recentOrders.error, recentAudit.error].find(Boolean);
+    if (overviewError) throw new Error(`Admin overview query failed: ${overviewError.message}`);
+
+    let emailById = new Map<string, string>();
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: userList, error: userListError } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+        if (!userListError && userList) {
+          emailById = new Map(userList.users.map((u) => [u.id, u.email ?? ""]));
+        }
+      } catch {
+        emailById = new Map<string, string>();
+      }
+    }
     const membersWithEmail = (members.data ?? []).map((m) => ({ ...m, email: emailById.get(m.id) ?? "" }));
 
-    const rewardsCat = await supabaseAdmin.from("rewards_catalog").select("id, name");
+    const rewardsCat = await db.from("rewards_catalog").select("id, name");
+    if (rewardsCat.error) throw new Error(`Rewards lookup failed: ${rewardsCat.error.message}`);
     const rewardName = new Map((rewardsCat.data ?? []).map((r) => [r.id, r.name]));
     const pendingEnriched = (pending.data ?? []).map((p) => ({
       ...p,

@@ -83,11 +83,15 @@ function AdminPage() {
   }
 
   if (overview.error) {
+    const message = overview.error instanceof Error ? overview.error.message : "";
+    const isPermissionError = /admin only|forbidden|unauthorized/i.test(message);
     return (
       <SiteLayout>
         <div className="mx-auto max-w-lg px-6 py-20 text-center">
-          <h1 className="text-display text-3xl">Admins only</h1>
-          <p className="mt-2 text-sm text-muted-foreground">You don't have permission to view this page.</p>
+          <h1 className="text-display text-3xl">{isPermissionError ? "Admins only" : "Admin dashboard unavailable"}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {isPermissionError ? "You don't have permission to view this page." : message || "The admin data could not be loaded."}
+          </p>
         </div>
       </SiteLayout>
     );
