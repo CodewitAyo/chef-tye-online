@@ -71,21 +71,21 @@ export function Chatbot() {
     setMessages((m) => [...m, reply]);
     setBusy(false);
 
-    if (authed) {
-      try {
-        const res = await persist({
-          data: {
-            conversationId: conversationIdRef.current,
-            userMessage: text,
-            assistantMessage: reply.content,
-            intentId,
-          },
-        });
-        conversationIdRef.current = res.conversationId;
-      } catch (err) {
-        console.warn("Chat persistence failed", err);
-      }
+    // Persist for signed-in members and anonymous visitors alike.
+    try {
+      const res = await persist({
+        data: {
+          conversationId: conversationIdRef.current,
+          userMessage: text,
+          assistantMessage: reply.content,
+          intentId,
+        },
+      });
+      conversationIdRef.current = res.conversationId;
+    } catch (err) {
+      console.warn("Chat persistence failed", err);
     }
+
   }
 
   return (
