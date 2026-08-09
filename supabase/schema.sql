@@ -361,3 +361,101 @@ INSERT INTO public.rewards_catalog (code, name, description, points_cost, tier_r
   ('vip_premium_reward',       'Premium reward: meal + side',   'Main meal with a premium side, on the house.',                 200, 'VIP'),
   ('elite_big_reward',         'Elite big reward',              'The house-special Elite reward — surprise from Chef Tye.',     300, 'Elite Circle')
 ON CONFLICT (code) DO NOTHING;
+
+-- =================================================================
+-- 13) SERVICE-ROLE-FREE OPERATIONS
+-- Everything below lets the app run entirely on the publishable key.
+-- =================================================================
+
+-- Admin-only email lookups (auth.users is not readable under RLS)
+CREATE OR REPLACE FUNCTION public.admin_user_id_by_email(_email text)
+RETURNS uuid LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+DECLARE uid uuid;
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'admin') THEN RAISE EXCEPTION 'Forbidden'; END IF;
+  SELECT id INTO uid FROM auth.users WHERE lower(email) = lower(_email) LIMIT 1;
+  RETURN uid;
+END; $$;
+REVOKE EXECUTE ON FUNCTION public.admin_user_id_by_email(text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_user_id_by_email(text) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.admin_emails_for_users(_user_ids uuid[])
+RETURNS TABLE (id uuid, email text) LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'admin') THEN RAISE EXCEPTION 'Forbidden'; END IF;
+  RETURN QUERY SELECT u.id, u.email::text FROM auth.users u WHERE u.id = ANY(_user_ids);
+END; $$;
+REVOKE EXECUTE ON FUNCTION public.admin_emails_for_users(uuid[]) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_emails_for_users(uuid[]) TO authenticated;
+
+-- Admin writes under RLS (no service role)
+GRANT INSERT, UPDATE ON public.orders TO authenticated;
+GRANT INSERT ON public.loyalty_points_ledger TO authenticated;
+GRANT UPDATE ON public.reward_redemptions TO authenticated;
+GRANT INSERT ON public.audit_log TO authenticated;
+
+DROP POLICY IF EXISTS "Admins insert orders" ON public.orders;
+CREATE POLICY "Admins insert orders" ON public.orders FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins update orders" ON public.orders;
+CREATE POLICY "Admins update orders" ON public.orders FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins insert ledger" ON public.loyalty_points_ledger;
+CREATE POLICY "Admins insert ledger" ON public.loyalty_points_ledger FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins update redemptions" ON public.reward_redemptions;
+CREATE POLICY "Admins update redemptions" ON public.reward_redemptions FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Authenticated insert audit" ON public.audit_log;
+CREATE POLICY "Authenticated insert audit" ON public.audit_log FOR INSERT TO authenticated
+  WITH CHECK (actor_id = auth.uid());
+
+-- Atomic reward redemption (balance check + redemption + ledger + audit)
+CREATE OR REPLACE FUNCTION public.redeem_reward(_reward_id uuid)
+RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE _uid uuid := auth.uid(); _name text; _cost integer; _active boolean; _bal integer; _red_id uuid;
+BEGIN
+  IF _uid IS NULL THEN RAISE EXCEPTION 'Not authenticated' USING ERRCODE = '42501'; END IF;
+  SELECT name, points_cost, active INTO _name, _cost, _active FROM public.rewards_catalog WHERE id = _reward_id;
+  IF NOT FOUND OR NOT _active THEN RAISE EXCEPTION 'Reward unavailable'; END IF;
+  SELECT points INTO _bal FROM public.profiles WHERE id = _uid FOR UPDATE;
+  IF _bal IS NULL OR _bal < _cost THEN RAISE EXCEPTION 'Not enough points'; END IF;
+  INSERT INTO public.reward_redemptions (user_id, reward_id, points_cost, status)
+  VALUES (_uid, _reward_id, _cost, 'available') RETURNING id INTO _red_id;
+  INSERT INTO public.loyalty_points_ledger (user_id, delta, reason, redemption_id, note, created_by)
+  VALUES (_uid, -_cost, 'redeem', _red_id, 'Redeemed: ' || _name, _uid);
+  INSERT INTO public.audit_log (actor_id, action, target_table, target_id, after)
+  VALUES (_uid, 'reward.redeem', 'reward_redemptions', _red_id::text,
+          jsonb_build_object('reward_id', _reward_id, 'points_cost', _cost));
+  RETURN _red_id;
+END; $$;
+REVOKE EXECUTE ON FUNCTION public.redeem_reward(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.redeem_reward(uuid) TO authenticated;
+
+-- Chat writes for members and anonymous visitors (publishable key only)
+GRANT INSERT, UPDATE ON public.chat_conversations TO anon, authenticated;
+GRANT SELECT ON public.chat_conversations TO anon;
+GRANT INSERT ON public.chat_messages TO anon, authenticated;
+
+DROP POLICY IF EXISTS "Users insert own conversations" ON public.chat_conversations;
+CREATE POLICY "Users insert own conversations" ON public.chat_conversations FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Anon insert guest conversations" ON public.chat_conversations;
+CREATE POLICY "Anon insert guest conversations" ON public.chat_conversations FOR INSERT TO anon
+  WITH CHECK (user_id IS NULL);
+DROP POLICY IF EXISTS "Users update own conversations" ON public.chat_conversations;
+CREATE POLICY "Users update own conversations" ON public.chat_conversations FOR UPDATE TO authenticated
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Anon update guest conversations" ON public.chat_conversations;
+CREATE POLICY "Anon update guest conversations" ON public.chat_conversations FOR UPDATE TO anon
+  USING (user_id IS NULL) WITH CHECK (user_id IS NULL);
+DROP POLICY IF EXISTS "Anon read guest conversations" ON public.chat_conversations;
+CREATE POLICY "Anon read guest conversations" ON public.chat_conversations FOR SELECT TO anon
+  USING (user_id IS NULL);
+
+DROP POLICY IF EXISTS "Users insert own conversation messages" ON public.chat_messages;
+CREATE POLICY "Users insert own conversation messages" ON public.chat_messages FOR INSERT TO authenticated
+  WITH CHECK (EXISTS (SELECT 1 FROM public.chat_conversations c WHERE c.id = conversation_id AND c.user_id = auth.uid()));
+DROP POLICY IF EXISTS "Anon insert guest conversation messages" ON public.chat_messages;
+CREATE POLICY "Anon insert guest conversation messages" ON public.chat_messages FOR INSERT TO anon
+  WITH CHECK (EXISTS (SELECT 1 FROM public.chat_conversations c WHERE c.id = conversation_id AND c.user_id IS NULL));
