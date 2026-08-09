@@ -55,45 +55,21 @@ export const redeemReward = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => redeemInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: reward, error: rErr } = await supabase
-      .from("rewards_catalog")
-      .select("id, name, points_cost, active")
-      .eq("id", data.rewardId)
-      .maybeSingle();
-    if (rErr || !reward || !reward.active) throw new Error("Reward unavailable.");
-
-    const { data: profile } = await supabase.from("profiles").select("points").eq("id", userId).maybeSingle();
-    if (!profile || profile.points < reward.points_cost) throw new Error("Not enough points.");
-
-    const { data: red, error: redErr } = await supabase
-      .from("reward_redemptions")
-      .insert({ user_id: userId, reward_id: reward.id, points_cost: reward.points_cost, status: "available" })
-      .select("id")
-      .single();
-    if (redErr || !red) throw new Error("Could not create redemption.");
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: ledgerErr } = await supabaseAdmin.from("loyalty_points_ledger").insert({
-      user_id: userId,
-      delta: -reward.points_cost,
-      reason: "redeem",
-      redemption_id: red.id,
-      note: `Redeemed: ${reward.name}`,
-      created_by: userId,
+    // All checks (reward active, balance, ledger deduction, audit) happen
+    // atomically inside the redeem_reward SECURITY DEFINER function.
+    const { data: redemptionId, error } = await context.supabase.rpc("redeem_reward", {
+      _reward_id: data.rewardId,
     });
-    if (ledgerErr) throw new Error("Points deduction failed.");
-
-    await supabase.from("audit_log").insert({
-      actor_id: userId,
-      action: "reward.redeem",
-      target_table: "reward_redemptions",
-      target_id: red.id,
-      after: { reward_id: reward.id, points_cost: reward.points_cost },
-    });
-
-    return { ok: true, redemptionId: red.id };
+    if (error) {
+      const msg = error.message || "";
+      if (msg.includes("Not enough points")) throw new Error("Not enough points.");
+      if (msg.includes("Reward unavailable")) throw new Error("Reward unavailable.");
+      console.error("[loyalty] redeem failed", error);
+      throw new Error("Could not create redemption.");
+    }
+    return { ok: true, redemptionId: redemptionId as string };
   });
+
 
 const addOrderInput = z.object({
   userEmail: z.string().email(),

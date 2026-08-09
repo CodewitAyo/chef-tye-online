@@ -68,27 +68,47 @@ const persistInput = z.object({
 });
 
 export const persistChatTurn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => persistInput.parse(d))
-  .handler(async ({ data, context }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  .handler(async ({ data }) => {
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const { createPublicServerClient } = await import("@/lib/supabase-public.server");
+
+    const authHeader = getRequestHeader("authorization");
+    const token =
+      authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice("Bearer ".length) : null;
+    const supabase = createPublicServerClient(token);
+
+    let userId: string | null = null;
+    if (token) {
+      const { data: claims } = await supabase.auth.getClaims(token);
+      userId = (claims?.claims?.sub as string | undefined) ?? null;
+    }
+
     let convId = data.conversationId;
     if (!convId) {
-      const { data: conv, error } = await supabaseAdmin
+      const { data: conv, error } = await supabase
         .from("chat_conversations")
-        .insert({ user_id: context.userId, status: "open" })
+        .insert({ user_id: userId, status: "open" })
         .select("id")
         .single();
-      if (error || !conv) throw new Error("Could not start conversation");
+      if (error || !conv) {
+        console.error("[chat] conversation insert failed", error);
+        throw new Error("Could not start conversation");
+      }
       convId = conv.id;
     }
-    await supabaseAdmin.from("chat_messages").insert([
+
+    const { error: msgErr } = await supabase.from("chat_messages").insert([
       { conversation_id: convId, role: "user", content: data.userMessage },
       { conversation_id: convId, role: "assistant", content: data.assistantMessage, tool_name: data.intentId ?? null },
     ]);
-    await supabaseAdmin
+    if (msgErr) console.error("[chat] message insert failed", msgErr);
+
+    await supabase
       .from("chat_conversations")
       .update({ last_message_at: new Date().toISOString() })
       .eq("id", convId);
+
     return { conversationId: convId };
   });
+
