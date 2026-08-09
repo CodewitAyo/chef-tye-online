@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, X, Send, Loader2, ChefHat } from "lucide-react";
 import { matchIntent } from "@/lib/chatbot-intents";
 import { chatbotAsk, persistChatTurn } from "@/lib/chatbot.functions";
-import { supabase } from "@/integrations/supabase/client";
+
 
 type Msg = {
   role: "user" | "assistant";
@@ -28,17 +28,11 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Msg[]>([GREETING]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [authed, setAuthed] = useState(false);
   const conversationIdRef = useRef<string | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const ask = useServerFn(chatbotAsk);
   const persist = useServerFn(persistChatTurn);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setAuthed(!!s));
-    return () => sub.subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
@@ -71,21 +65,21 @@ export function Chatbot() {
     setMessages((m) => [...m, reply]);
     setBusy(false);
 
-    if (authed) {
-      try {
-        const res = await persist({
-          data: {
-            conversationId: conversationIdRef.current,
-            userMessage: text,
-            assistantMessage: reply.content,
-            intentId,
-          },
-        });
-        conversationIdRef.current = res.conversationId;
-      } catch (err) {
-        console.warn("Chat persistence failed", err);
-      }
+    // Persist for signed-in members and anonymous visitors alike.
+    try {
+      const res = await persist({
+        data: {
+          conversationId: conversationIdRef.current,
+          userMessage: text,
+          assistantMessage: reply.content,
+          intentId,
+        },
+      });
+      conversationIdRef.current = res.conversationId;
+    } catch (err) {
+      console.warn("Chat persistence failed", err);
     }
+
   }
 
   return (
