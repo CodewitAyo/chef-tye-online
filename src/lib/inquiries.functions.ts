@@ -16,8 +16,9 @@ export type InquiryInput = z.infer<typeof inquirySchema>;
 export const submitInquiry = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => inquirySchema.parse(data))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("inquiries").insert({
+    const { createPublicServerClient } = await import("@/lib/supabase-public.server");
+    const supabase = createPublicServerClient();
+    const { error } = await supabase.from("inquiries").insert({
       type: data.type,
       name: data.name,
       email: data.email,
