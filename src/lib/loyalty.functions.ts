@@ -88,6 +88,11 @@ async function requireAdmin(supabase: unknown, userId: string) {
   const { data, error } = await s.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error) throw new Error("Admin check failed.");
   if (data !== true) throw new Error("Forbidden: admin only.");
+
+  // Second factor: the shared admin access code, verified server-side.
+  const { getRequestHeader } = await import("@tanstack/react-start/server");
+  const { requireAdminVerified } = await import("./admin-code.server");
+  await requireAdminVerified(userId, getRequestHeader("x-admin-token"));
 }
 
 export const adminAddOrder = createServerFn({ method: "POST" })

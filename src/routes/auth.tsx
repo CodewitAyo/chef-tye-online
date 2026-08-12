@@ -4,6 +4,8 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { setAuthPersistMode } from "@/lib/auth-storage";
+import { clearAdminToken } from "@/lib/admin-token";
 import { ChefHat, Loader2, Sparkles, ArrowLeft } from "lucide-react";
 
 const searchSchema = z.object({
@@ -44,6 +46,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -76,6 +79,9 @@ function AuthPage() {
         setMode("signin");
       } else {
         const parsedPassword = passwordSchema.parse(password);
+        // Decide where the session gets stored BEFORE Supabase writes it.
+        setAuthPersistMode(keepSignedIn ? "local" : "session");
+        clearAdminToken(); // a fresh sign-in always re-prompts for the admin code
         const { error } = await supabase.auth.signInWithPassword({ email: parsedEmail, password: parsedPassword });
         if (error) throw error;
         toast.success("Welcome back!");
@@ -142,9 +148,15 @@ function AuthPage() {
               )}
 
               {mode === "signin" && (
-                <button type="button" onClick={() => setMode("forgot")} className="block w-full text-right text-xs font-bold uppercase tracking-widest text-brand hover:underline">
-                  Forgot password?
-                </button>
+                <div className="flex items-center justify-between gap-3">
+                  <label className="flex cursor-pointer items-center gap-2 text-xs font-bold uppercase tracking-widest text-charcoal/70">
+                    <input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} className="h-4 w-4 cursor-pointer accent-brand" />
+                    Keep me signed in
+                  </label>
+                  <button type="button" onClick={() => setMode("forgot")} className="text-xs font-bold uppercase tracking-widest text-brand hover:underline">
+                    Forgot password?
+                  </button>
+                </div>
               )}
 
               <button type="submit" disabled={busy} className="btn-primary mt-2 w-full justify-center disabled:opacity-60">
