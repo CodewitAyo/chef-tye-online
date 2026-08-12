@@ -17,7 +17,59 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
+function AdminCodeGate({ onVerified }: { onVerified: () => void }) {
+  const verify = useServerFn(verifyAdminCode);
+  const [code, setCode] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const res = await verify({ data: { code } });
+      setAdminToken(res.token);
+      setCode("");
+      onVerified();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Incorrect admin code.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SiteLayout>
+      <div className="mx-auto max-w-md px-6 py-24">
+        <div className="rounded-3xl border-2 border-charcoal bg-card p-8">
+          <div className="flex items-center gap-2 text-brand">
+            <ShieldCheck size={18} /><h1 className="text-display text-3xl">Admin code</h1>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter the shared admin access code to unlock Kitchen HQ for this session.
+          </p>
+          <form onSubmit={submit} className="mt-5 space-y-3">
+            <input
+              type="password" required autoFocus value={code} onChange={(e) => setCode(e.target.value)}
+              placeholder="Admin access code" autoComplete="one-time-code"
+              className="w-full rounded-xl border-2 border-border bg-background px-3 py-2.5 text-sm"
+            />
+            <button disabled={busy || !code} className="btn-primary w-full justify-center disabled:opacity-60">
+              {busy ? <Loader2 className="animate-spin" size={14} /> : null} Unlock
+            </button>
+          </form>
+        </div>
+      </div>
+    </SiteLayout>
+  );
+}
+
 function AdminPage() {
+  const [verified, setVerified] = useState(() => Boolean(getAdminToken()));
+  if (!verified) return <AdminCodeGate onVerified={() => setVerified(true)} />;
+  return <AdminConsole onCodeExpired={() => { clearAdminToken(); setVerified(false); }} />;
+}
+
+function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
   const qc = useQueryClient();
   const fetchOverview = useServerFn(getAdminOverview);
   const addOrder = useServerFn(adminAddOrder);
