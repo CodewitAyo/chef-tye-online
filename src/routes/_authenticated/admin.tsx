@@ -132,6 +132,12 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
     } finally { setBusy(null); }
   }
 
+  const overviewErrorMessage = overview.error instanceof Error ? overview.error.message : "";
+  const needsCode = /admin code required/i.test(overviewErrorMessage);
+  useEffect(() => {
+    if (needsCode) onCodeExpired();
+  }, [needsCode, onCodeExpired]);
+
   if (overview.isLoading) {
     return (<SiteLayout><div className="grid min-h-[60vh] place-items-center"><Loader2 className="animate-spin" /></div></SiteLayout>);
   }
