@@ -138,6 +138,10 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
 
   if (overview.error) {
     const message = overview.error instanceof Error ? overview.error.message : "";
+    if (/admin code required/i.test(message)) {
+      onCodeExpired();
+      return (<SiteLayout><div className="grid min-h-[60vh] place-items-center"><Loader2 className="animate-spin" /></div></SiteLayout>);
+    }
     const isPermissionError = /admin only|forbidden|unauthorized/i.test(message);
     return (
       <SiteLayout>
