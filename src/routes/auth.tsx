@@ -4,6 +4,8 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { setAuthPersistMode } from "@/lib/auth-storage";
+import { clearAdminToken } from "@/lib/admin-token";
 import { ChefHat, Loader2, Sparkles, ArrowLeft } from "lucide-react";
 
 const searchSchema = z.object({
