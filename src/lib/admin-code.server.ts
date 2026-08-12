@@ -3,8 +3,9 @@
 
 const TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
-function enc(s: string): Uint8Array {
-  return new TextEncoder().encode(s);
+function enc(s: string): ArrayBuffer {
+  const bytes = new TextEncoder().encode(s);
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 function toHex(buf: ArrayBuffer): string {
