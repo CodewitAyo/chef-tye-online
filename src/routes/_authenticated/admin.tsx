@@ -9,6 +9,8 @@ import {
   adminAddOrder, adminAdjustPoints, adminHonorRedemption, getAdminOverview,
 } from "@/lib/loyalty.functions";
 import { ORDER_SOURCES } from "@/lib/loyalty";
+import { verifyAdminCode } from "@/lib/admin-code.functions";
+import { getAdminToken, setAdminToken, clearAdminToken } from "@/lib/admin-token";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — Chef Tye" }, { name: "robots", content: "noindex" }] }),
