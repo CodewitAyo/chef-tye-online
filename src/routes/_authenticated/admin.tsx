@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -65,8 +65,9 @@ function AdminCodeGate({ onVerified }: { onVerified: () => void }) {
 
 function AdminPage() {
   const [verified, setVerified] = useState(() => Boolean(getAdminToken()));
+  const handleExpired = useCallback(() => { clearAdminToken(); setVerified(false); }, []);
   if (!verified) return <AdminCodeGate onVerified={() => setVerified(true)} />;
-  return <AdminConsole onCodeExpired={() => { clearAdminToken(); setVerified(false); }} />;
+  return <AdminConsole onCodeExpired={handleExpired} />;
 }
 
 function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
@@ -144,8 +145,7 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
 
   if (overview.error) {
     const message = overview.error instanceof Error ? overview.error.message : "";
-    if (/admin code required/i.test(message)) {
-      onCodeExpired();
+    if (needsCode) {
       return (<SiteLayout><div className="grid min-h-[60vh] place-items-center"><Loader2 className="animate-spin" /></div></SiteLayout>);
     }
     const isPermissionError = /admin only|forbidden|unauthorized/i.test(message);
