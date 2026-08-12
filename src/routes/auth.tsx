@@ -77,6 +77,9 @@ function AuthPage() {
         setMode("signin");
       } else {
         const parsedPassword = passwordSchema.parse(password);
+        // Decide where the session gets stored BEFORE Supabase writes it.
+        setAuthPersistMode(keepSignedIn ? "local" : "session");
+        clearAdminToken(); // a fresh sign-in always re-prompts for the admin code
         const { error } = await supabase.auth.signInWithPassword({ email: parsedEmail, password: parsedPassword });
         if (error) throw error;
         toast.success("Welcome back!");
