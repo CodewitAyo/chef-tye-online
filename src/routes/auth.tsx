@@ -148,9 +148,15 @@ function AuthPage() {
               )}
 
               {mode === "signin" && (
-                <button type="button" onClick={() => setMode("forgot")} className="block w-full text-right text-xs font-bold uppercase tracking-widest text-brand hover:underline">
-                  Forgot password?
-                </button>
+                <div className="flex items-center justify-between gap-3">
+                  <label className="flex cursor-pointer items-center gap-2 text-xs font-bold uppercase tracking-widest text-charcoal/70">
+                    <input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} className="h-4 w-4 cursor-pointer accent-brand" />
+                    Keep me signed in
+                  </label>
+                  <button type="button" onClick={() => setMode("forgot")} className="text-xs font-bold uppercase tracking-widest text-brand hover:underline">
+                    Forgot password?
+                  </button>
+                </div>
               )}
 
               <button type="submit" disabled={busy} className="btn-primary mt-2 w-full justify-center disabled:opacity-60">
