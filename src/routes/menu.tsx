@@ -4,7 +4,7 @@ import { z } from "zod";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { MenuItemDialog } from "@/components/site/MenuItemDialog";
 import { ShoppingBag, Flame, Star, Image as ImageIcon } from "lucide-react";
-import { MENU_ITEMS, FULL_MENU_IMAGE, findMenuItem, type MenuItem } from "@/lib/menu-data";
+import { MENU_ITEMS, FULL_MENU_IMAGE } from "@/lib/menu-data";
 import { ORDER_URL } from "@/lib/constants";
 
 const searchSchema = z.object({
