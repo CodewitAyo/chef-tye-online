@@ -18,9 +18,9 @@ import { WhatsappIcon } from "@/components/site/WhatsappIcon";
 
 
 const searchSchema = z.object({
-  type: z.enum(["contact", "donation", "catering"]).optional(),
-  amount: z.coerce.number().int().min(0).max(1_000_000_000).optional(),
+  type: z.enum(["contact", "catering"]).optional(),
 });
+
 
 export const Route = createFileRoute("/contact")({
   validateSearch: (search) => searchSchema.parse(search),
