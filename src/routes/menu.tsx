@@ -30,28 +30,21 @@ const sections = ["Chef Tye Pasta", "Mains", "Extras"] as const;
 function MenuPage() {
   const navigate = useNavigate({ from: "/menu" });
   const search = useSearch({ from: "/menu" });
-  const [active, setActive] = useState<MenuItem | null>(null);
   const [showFull, setShowFull] = useState(false);
 
   useEffect(() => {
-    const it = findMenuItem(search.item);
-    setActive(it);
     setShowFull(search.full === "1");
-  }, [search.item, search.full]);
+  }, [search.full]);
 
-  function openItem(item: MenuItem) {
-    setActive(item);
-    navigate({ search: { item: item.id }, replace: false });
-  }
   function openFull() {
     setShowFull(true);
     navigate({ search: { full: "1" }, replace: false });
   }
   function closeDialog() {
-    setActive(null);
     setShowFull(false);
     navigate({ search: {}, replace: false });
   }
+
 
   const featured = MENU_ITEMS.filter((m) => ["holy-grail", "asap", "lust"].includes(m.id));
 
