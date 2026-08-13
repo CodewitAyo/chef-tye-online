@@ -130,13 +130,10 @@ function ContactPage() {
             <Field label="Phone (optional)">
               <input type="tel" maxLength={40} value={state.phone} onChange={(e) => setState({ ...state, phone: e.target.value })} className="input" placeholder="+234 ..." />
             </Field>
-            <Field label={state.type === "donation" ? "Donation amount (₦)" : "Subject"}>
-              {state.type === "donation" ? (
-                <input type="number" min={0} step={500} value={state.amount} onChange={(e) => setState({ ...state, amount: e.target.value })} className="input" placeholder="e.g. 15000" />
-              ) : (
-                <input type="text" maxLength={200} value={state.subject} onChange={(e) => setState({ ...state, subject: e.target.value })} className="input" placeholder="Subject" />
-              )}
+            <Field label="Subject">
+              <div className="input bg-muted/60 text-foreground/80">{state.subject}</div>
             </Field>
+
           </div>
 
           <div className="mt-4">
