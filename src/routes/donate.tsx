@@ -201,7 +201,7 @@ function DonatePage() {
           <div className="rounded-3xl border-2 border-charcoal bg-card p-6 sm:p-8">
             <h3 className="text-display text-2xl">Partner as a brand?</h3>
             <p className="mt-2 text-sm text-muted-foreground">Sponsor a full feeding day or send in-kind supplies.</p>
-            <Link to="/contact" search={{ type: "donation" } as never} className="btn-outline mt-4 w-full justify-center">Get in touch</Link>
+            <Link to="/contact" className="btn-outline mt-4 w-full justify-center">Get in touch</Link>
           </div>
         </aside>
       </section>

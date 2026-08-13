@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  Instagram, Mail, MapPin, Phone, Loader2, Send, Heart, Utensils, MessageCircle,
+  Instagram, Mail, MapPin, Phone, Loader2, Send, Utensils, MessageCircle,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { submitInquiry } from "@/lib/inquiries.functions";
