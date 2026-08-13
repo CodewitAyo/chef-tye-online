@@ -34,7 +34,34 @@ export function Chatbot() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const ask = useServerFn(chatbotAsk);
   const persist = useServerFn(persistChatTurn);
+  const loadRecent = useServerFn(loadRecentConversation);
+  const { user, loading: authLoading } = useAuth();
+  const restoredRef = useRef(false);
 
+  // Restore the signed-in member's most recent conversation once per mount.
+  useEffect(() => {
+    if (authLoading || !user || restoredRef.current) return;
+    restoredRef.current = true;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await loadRecent();
+        if (cancelled || !res?.conversationId || res.messages.length === 0) return;
+        conversationIdRef.current = res.conversationId;
+        setMessages([
+          GREETING,
+          ...res.messages
+            .filter((m) => m.role === "user" || m.role === "assistant")
+            .map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+        ]);
+      } catch (err) {
+        console.warn("Chat history restore failed", err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, authLoading, loadRecent]);
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
@@ -50,8 +77,14 @@ export function Chatbot() {
 
     let reply: Msg;
     let intentId: string | undefined;
-    const intent = matchIntent(text);
+    // Deterministic intents only answer first-touch questions; after that the AI
+    // handles everything so it keeps full conversation context.
+    const isFirstMessage = messages.filter((m) => m.role === "user").length === 0;
+    const intent = isFirstMessage ? matchIntent(text) : null;
     if (intent) {
+      intentId = intent.id;
+      reply = { role: "assistant", content: intent.answer, actions: intent.actions };
+
       intentId = intent.id;
       reply = { role: "assistant", content: intent.answer, actions: intent.actions };
     } else {
