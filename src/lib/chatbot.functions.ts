@@ -109,7 +109,9 @@ export const persistChatTurn = createServerFn({ method: "POST" })
       .update({ last_message_at: new Date().toISOString() })
       .eq("id", convId);
 
+    return { conversationId: convId };
   });
+
 
 /** Loads the signed-in user's most recent open conversation and its messages. */
 export const loadRecentConversation = createServerFn({ method: "POST" }).handler(async () => {
