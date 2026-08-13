@@ -27,9 +27,10 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact & Catering — Chef Tye" },
-      { name: "description", content: "Reach Chef Tye for catering, private dinners, brand collaborations, or Feed The Streets donations." },
+      { name: "description", content: "Reach Chef Tye for catering, private dinners, brand collaborations or press." },
       { property: "og:title", content: "Contact Chef Tye" },
-      { property: "og:description", content: "Book catering, ask about the menu, or support Feed The Streets." },
+      { property: "og:description", content: "Book catering, plan a private dinner, or ask about the menu." },
+
     ],
   }),
   component: ContactPage,
@@ -100,7 +101,7 @@ function ContactPage() {
             LET'S <span className="text-brand">TALK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Catering, private dinners, brand collabs, press, or a donation to Feed The Streets. Drop a message and Chef Tye's team will respond within 24 hours.
+            Catering, private dinners, brand collabs or press. Drop a message and Chef Tye's team will respond within 24 hours. Looking to support Feed The Streets? Head to the donate page.
           </p>
         </div>
       </section>
