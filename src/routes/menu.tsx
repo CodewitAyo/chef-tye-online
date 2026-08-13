@@ -143,23 +143,28 @@ function MenuPage() {
                 <ul className="mt-6 divide-y divide-border">
                   {items.map((it) => (
                     <li key={it.id}>
-                      <button
-                        type="button"
-                        onClick={() => openItem(it)}
-                        className="group grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 py-4 text-left transition-colors hover:bg-brand/5"
-                      >
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 py-4 text-left">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-display text-2xl text-foreground transition-colors group-hover:text-brand">{it.name}</h3>
+                            <h3 className="text-display text-2xl text-foreground">{it.name}</h3>
                             {it.tag && (
                               <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-brand-foreground">{it.tag}</span>
                             )}
                           </div>
                           {it.short && <p className="mt-1 text-sm text-muted-foreground">{it.short}</p>}
+                          <a
+                            href={ORDER_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 inline-flex items-center gap-2 rounded-full border border-charcoal/30 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:border-brand hover:bg-brand hover:text-brand-foreground"
+                          >
+                            <ShoppingBag size={12} /> Order
+                          </a>
                         </div>
                         <span className="text-display text-xl text-brand">{it.price}</span>
-                      </button>
+                      </div>
                     </li>
+
                   ))}
                 </ul>
               </div>
