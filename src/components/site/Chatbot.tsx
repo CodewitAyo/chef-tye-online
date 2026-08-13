@@ -3,7 +3,9 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, X, Send, Loader2, ChefHat } from "lucide-react";
 import { matchIntent } from "@/lib/chatbot-intents";
-import { chatbotAsk, persistChatTurn } from "@/lib/chatbot.functions";
+import { chatbotAsk, persistChatTurn, loadRecentConversation } from "@/lib/chatbot.functions";
+import { useAuth } from "@/lib/use-auth";
+
 
 
 type Msg = {
