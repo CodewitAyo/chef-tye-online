@@ -5,7 +5,7 @@ import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  Instagram, Mail, MapPin, Phone, Loader2, Send, Heart, Utensils, MessageCircle,
+  Instagram, Mail, MapPin, Phone, Loader2, Send, Utensils, MessageCircle,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { submitInquiry } from "@/lib/inquiries.functions";
@@ -18,32 +18,32 @@ import { WhatsappIcon } from "@/components/site/WhatsappIcon";
 
 
 const searchSchema = z.object({
-  type: z.enum(["contact", "donation", "catering"]).optional(),
-  amount: z.coerce.number().int().min(0).max(1_000_000_000).optional(),
+  type: z.enum(["contact", "catering"]).optional(),
 });
+
 
 export const Route = createFileRoute("/contact")({
   validateSearch: (search) => searchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "Contact & Catering — Chef Tye" },
-      { name: "description", content: "Reach Chef Tye for catering, private dinners, brand collaborations, or Feed The Streets donations." },
+      { name: "description", content: "Reach Chef Tye for catering, private dinners, brand collaborations or press." },
       { property: "og:title", content: "Contact Chef Tye" },
-      { property: "og:description", content: "Book catering, ask about the menu, or support Feed The Streets." },
+      { property: "og:description", content: "Book catering, plan a private dinner, or ask about the menu." },
+
     ],
   }),
   component: ContactPage,
 });
 
 type FormState = {
-  type: "contact" | "donation" | "catering";
-  name: string; email: string; phone: string; subject: string; message: string; amount: string;
+  type: "contact" | "catering";
+  name: string; email: string; phone: string; subject: string; message: string;
 };
 
 const typeMeta = {
   contact: { label: "General", icon: MessageCircle, subject: "Hey Chef Tye,", message: "" },
   catering: { label: "Catering", icon: Utensils, subject: "Catering enquiry", message: "Hi Chef Tye, I'd love to book you for an event.\nDate:\nGuests:\nLocation:\nBudget:\n" },
-  donation: { label: "Donate", icon: Heart, subject: "Feed The Streets — Donation", message: "Hi Chef Tye, I'd like to donate to the Feed The Streets Campaign.\n" },
 } as const;
 
 function ContactPage() {
@@ -55,7 +55,6 @@ function ContactPage() {
     name: "", email: "", phone: "",
     subject: typeMeta[initialType].subject,
     message: typeMeta[initialType].message,
-    amount: search.amount ? String(search.amount) : "",
   });
 
   const submit = useServerFn(submitInquiry);
@@ -72,14 +71,13 @@ function ContactPage() {
     setState((s) => ({
       ...s,
       type: t,
-      subject: s.subject === typeMeta[s.type].subject ? typeMeta[t].subject : s.subject,
+      subject: typeMeta[t].subject,
       message: s.message === typeMeta[s.type].message ? typeMeta[t].message : s.message,
     }));
   }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const amount = state.amount ? parseInt(state.amount, 10) : undefined;
     mutation.mutate({
       data: {
         type: state.type,
@@ -88,10 +86,11 @@ function ContactPage() {
         phone: state.phone.trim(),
         subject: state.subject.trim(),
         message: state.message.trim(),
-        amount_ngn: Number.isFinite(amount) ? amount : undefined,
       },
     });
   }
+
+
 
   return (
     <SiteLayout>
@@ -102,7 +101,7 @@ function ContactPage() {
             LET'S <span className="text-brand">TALK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Catering, private dinners, brand collabs, press, or a donation to Feed The Streets. Drop a message and Chef Tye's team will respond within 24 hours.
+            Catering, private dinners, brand collabs or press. Drop a message and Chef Tye's team will respond within 24 hours. Looking to support Feed The Streets? Head to the donate page.
           </p>
         </div>
       </section>
@@ -132,13 +131,10 @@ function ContactPage() {
             <Field label="Phone (optional)">
               <input type="tel" maxLength={40} value={state.phone} onChange={(e) => setState({ ...state, phone: e.target.value })} className="input" placeholder="+234 ..." />
             </Field>
-            <Field label={state.type === "donation" ? "Donation amount (₦)" : "Subject"}>
-              {state.type === "donation" ? (
-                <input type="number" min={0} step={500} value={state.amount} onChange={(e) => setState({ ...state, amount: e.target.value })} className="input" placeholder="e.g. 15000" />
-              ) : (
-                <input type="text" maxLength={200} value={state.subject} onChange={(e) => setState({ ...state, subject: e.target.value })} className="input" placeholder="Subject" />
-              )}
+            <Field label="Subject">
+              <div className="input bg-muted/60 text-foreground/80">{state.subject}</div>
             </Field>
+
           </div>
 
           <div className="mt-4">

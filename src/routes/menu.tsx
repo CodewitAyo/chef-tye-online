@@ -4,7 +4,7 @@ import { z } from "zod";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { MenuItemDialog } from "@/components/site/MenuItemDialog";
 import { ShoppingBag, Flame, Star, Image as ImageIcon } from "lucide-react";
-import { MENU_ITEMS, FULL_MENU_IMAGE, findMenuItem, type MenuItem } from "@/lib/menu-data";
+import { MENU_ITEMS, FULL_MENU_IMAGE } from "@/lib/menu-data";
 import { ORDER_URL } from "@/lib/constants";
 
 const searchSchema = z.object({
@@ -30,28 +30,21 @@ const sections = ["Chef Tye Pasta", "Mains", "Extras"] as const;
 function MenuPage() {
   const navigate = useNavigate({ from: "/menu" });
   const search = useSearch({ from: "/menu" });
-  const [active, setActive] = useState<MenuItem | null>(null);
   const [showFull, setShowFull] = useState(false);
 
   useEffect(() => {
-    const it = findMenuItem(search.item);
-    setActive(it);
     setShowFull(search.full === "1");
-  }, [search.item, search.full]);
+  }, [search.full]);
 
-  function openItem(item: MenuItem) {
-    setActive(item);
-    navigate({ search: { item: item.id }, replace: false });
-  }
   function openFull() {
     setShowFull(true);
     navigate({ search: { full: "1" }, replace: false });
   }
   function closeDialog() {
-    setActive(null);
     setShowFull(false);
     navigate({ search: {}, replace: false });
   }
+
 
   const featured = MENU_ITEMS.filter((m) => ["holy-grail", "asap", "lust"].includes(m.id));
 
@@ -82,14 +75,12 @@ function MenuPage() {
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-14 sm:px-8 md:grid-cols-2">
         {featured.map((c) => (
-          <button
+          <div
             key={c.id}
-            type="button"
-            onClick={() => openItem(c)}
-            className="card-lift group relative cursor-pointer overflow-hidden rounded-3xl bg-card text-left shadow-sm ring-1 ring-border"
+            className="group relative overflow-hidden rounded-3xl bg-card text-left shadow-sm ring-1 ring-border"
           >
             <div className="aspect-[16/10] w-full overflow-hidden">
-              <img src={c.image} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <img src={c.image} alt={c.name} className="h-full w-full object-cover" />
             </div>
             <div className="p-6">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand">
@@ -101,9 +92,18 @@ function MenuPage() {
                 <span className="text-display text-2xl text-brand">{c.price}</span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{c.short}</p>
+              <a
+                href={ORDER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-full border-2 border-charcoal px-4 py-2 text-xs font-black uppercase tracking-widest text-foreground transition-colors hover:bg-brand hover:border-brand hover:text-brand-foreground"
+              >
+                <ShoppingBag size={14} /> Order
+              </a>
             </div>
-          </button>
+          </div>
         ))}
+
 
         <button
           type="button"
@@ -136,23 +136,28 @@ function MenuPage() {
                 <ul className="mt-6 divide-y divide-border">
                   {items.map((it) => (
                     <li key={it.id}>
-                      <button
-                        type="button"
-                        onClick={() => openItem(it)}
-                        className="group grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 py-4 text-left transition-colors hover:bg-brand/5"
-                      >
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 py-4 text-left">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-display text-2xl text-foreground transition-colors group-hover:text-brand">{it.name}</h3>
+                            <h3 className="text-display text-2xl text-foreground">{it.name}</h3>
                             {it.tag && (
                               <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-brand-foreground">{it.tag}</span>
                             )}
                           </div>
                           {it.short && <p className="mt-1 text-sm text-muted-foreground">{it.short}</p>}
+                          <a
+                            href={ORDER_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 inline-flex items-center gap-2 rounded-full border border-charcoal/30 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:border-brand hover:bg-brand hover:text-brand-foreground"
+                          >
+                            <ShoppingBag size={12} /> Order
+                          </a>
                         </div>
                         <span className="text-display text-xl text-brand">{it.price}</span>
-                      </button>
+                      </div>
                     </li>
+
                   ))}
                 </ul>
               </div>
@@ -174,10 +179,11 @@ function MenuPage() {
       </section>
 
       <MenuItemDialog
-        item={active}
-        fullMenuImage={showFull && !active ? FULL_MENU_IMAGE : null}
+        item={null}
+        fullMenuImage={showFull ? FULL_MENU_IMAGE : null}
         onClose={closeDialog}
       />
+
     </SiteLayout>
   );
 }
