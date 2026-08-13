@@ -36,14 +36,13 @@ export const Route = createFileRoute("/contact")({
 });
 
 type FormState = {
-  type: "contact" | "donation" | "catering";
-  name: string; email: string; phone: string; subject: string; message: string; amount: string;
+  type: "contact" | "catering";
+  name: string; email: string; phone: string; subject: string; message: string;
 };
 
 const typeMeta = {
   contact: { label: "General", icon: MessageCircle, subject: "Hey Chef Tye,", message: "" },
   catering: { label: "Catering", icon: Utensils, subject: "Catering enquiry", message: "Hi Chef Tye, I'd love to book you for an event.\nDate:\nGuests:\nLocation:\nBudget:\n" },
-  donation: { label: "Donate", icon: Heart, subject: "Feed The Streets — Donation", message: "Hi Chef Tye, I'd like to donate to the Feed The Streets Campaign.\n" },
 } as const;
 
 function ContactPage() {
@@ -55,7 +54,6 @@ function ContactPage() {
     name: "", email: "", phone: "",
     subject: typeMeta[initialType].subject,
     message: typeMeta[initialType].message,
-    amount: search.amount ? String(search.amount) : "",
   });
 
   const submit = useServerFn(submitInquiry);
@@ -72,14 +70,13 @@ function ContactPage() {
     setState((s) => ({
       ...s,
       type: t,
-      subject: s.subject === typeMeta[s.type].subject ? typeMeta[t].subject : s.subject,
+      subject: typeMeta[t].subject,
       message: s.message === typeMeta[s.type].message ? typeMeta[t].message : s.message,
     }));
   }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const amount = state.amount ? parseInt(state.amount, 10) : undefined;
     mutation.mutate({
       data: {
         type: state.type,
@@ -88,10 +85,11 @@ function ContactPage() {
         phone: state.phone.trim(),
         subject: state.subject.trim(),
         message: state.message.trim(),
-        amount_ngn: Number.isFinite(amount) ? amount : undefined,
       },
     });
   }
+
+
 
   return (
     <SiteLayout>
