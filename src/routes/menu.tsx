@@ -82,14 +82,12 @@ function MenuPage() {
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-14 sm:px-8 md:grid-cols-2">
         {featured.map((c) => (
-          <button
+          <div
             key={c.id}
-            type="button"
-            onClick={() => openItem(c)}
-            className="card-lift group relative cursor-pointer overflow-hidden rounded-3xl bg-card text-left shadow-sm ring-1 ring-border"
+            className="group relative overflow-hidden rounded-3xl bg-card text-left shadow-sm ring-1 ring-border"
           >
             <div className="aspect-[16/10] w-full overflow-hidden">
-              <img src={c.image} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <img src={c.image} alt={c.name} className="h-full w-full object-cover" />
             </div>
             <div className="p-6">
               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand">
@@ -101,9 +99,18 @@ function MenuPage() {
                 <span className="text-display text-2xl text-brand">{c.price}</span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{c.short}</p>
+              <a
+                href={ORDER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-full border-2 border-charcoal px-4 py-2 text-xs font-black uppercase tracking-widest text-foreground transition-colors hover:bg-brand hover:border-brand hover:text-brand-foreground"
+              >
+                <ShoppingBag size={14} /> Order
+              </a>
             </div>
-          </button>
+          </div>
         ))}
+
 
         <button
           type="button"
