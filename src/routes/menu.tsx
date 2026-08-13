@@ -179,10 +179,11 @@ function MenuPage() {
       </section>
 
       <MenuItemDialog
-        item={active}
-        fullMenuImage={showFull && !active ? FULL_MENU_IMAGE : null}
+        item={null}
+        fullMenuImage={showFull ? FULL_MENU_IMAGE : null}
         onClose={closeDialog}
       />
+
     </SiteLayout>
   );
 }
