@@ -20,9 +20,12 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function describeAuditEntry(a: {
   action: string;
   target_id: string | null;
-  after?: Record<string, unknown> | null;
+  after?: unknown;
 }): string {
-  const after = a.after ?? {};
+  const after: Record<string, unknown> =
+    a.after && typeof a.after === "object" && !Array.isArray(a.after)
+      ? (a.after as Record<string, unknown>)
+      : {};
   switch (a.action) {
     case "order.admin_add": {
       const subtotal = typeof after.subtotalNgn === "number" ? `₦${after.subtotalNgn.toLocaleString()}` : "an order";
