@@ -129,13 +129,12 @@ function MealCarousel() {
 
 function HomePage() {
   const galleryItems: {
-    src: string; alt: string; label: string; itemId?: string; price?: string; short?: string;
+    src: string; alt: string; label: string; itemId?: string; linkTo?: string; price?: string; short?: string;
   }[] = [
     { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", itemId: "asap" },
     { src: meal2Asset.url, alt: "Holy Grail pasta", label: "Holy Grail", itemId: "holy-grail" },
-    { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef" },
+    { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef", linkTo: "/story" },
     { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", itemId: "lust" },
-    { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "Round 2" },
     { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck" },
   ].map((it) => {
     const m = findMenuItem(it.itemId);
@@ -245,6 +244,7 @@ function HomePage() {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-8 lg:grid-cols-3">
             {galleryItems.map((it) => {
+              const isLinked = Boolean(it.itemId || it.linkTo);
               const inner = (
                 <>
                   <div className="overflow-hidden">
@@ -260,22 +260,39 @@ function HomePage() {
                         <p className="mt-1.5 truncate text-xs text-muted-foreground">{it.short}</p>
                       )}
                     </div>
-                    <ArrowRight size={16} className="mt-1 shrink-0 translate-x-[-6px] text-brand opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                    {isLinked && (
+                      <ArrowRight size={16} className="mt-1 shrink-0 translate-x-[-6px] text-brand opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                    )}
                   </div>
                 </>
               );
-              return it.itemId ? (
-                <Link
-                  key={it.label}
-                  to="/menu"
-                  search={{ item: it.itemId }}
-                  className="group block overflow-hidden rounded-2xl bg-card ring-1 ring-border"
-                  aria-label={`See ${it.label} on the menu`}
-                >
-                  {inner}
-                </Link>
-              ) : (
-                <div key={it.label} className="group overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+              if (it.itemId) {
+                return (
+                  <Link
+                    key={it.label}
+                    to="/menu"
+                    search={{ item: it.itemId }}
+                    className="group block overflow-hidden rounded-2xl bg-card ring-1 ring-border"
+                    aria-label={`See ${it.label} on the menu`}
+                  >
+                    {inner}
+                  </Link>
+                );
+              }
+              if (it.linkTo) {
+                return (
+                  <Link
+                    key={it.label}
+                    to={it.linkTo}
+                    className="group block overflow-hidden rounded-2xl bg-card ring-1 ring-border"
+                    aria-label={`Go to ${it.label}`}
+                  >
+                    {inner}
+                  </Link>
+                );
+              }
+              return (
+                <div key={it.label} className="group cursor-default overflow-hidden rounded-2xl bg-card ring-1 ring-border">
                   {inner}
                 </div>
               );
@@ -333,18 +350,23 @@ function HomePage() {
         <div className="mx-auto grid max-w-7xl items-center gap-6 px-5 py-10 sm:px-8 md:grid-cols-[1.5fr_auto] md:py-16">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-charcoal/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest">
-              <Heart size={14} /> Every December
+              <ShoppingBag size={14} /> Ready When You Are
             </div>
-            <h2 className="mt-4 text-display text-4xl leading-[0.95] sm:text-6xl">Feed The Streets Campaign</h2>
+            <h2 className="mt-4 text-display text-4xl leading-[0.95] sm:text-6xl">Hungry Yet?</h2>
             <p className="mt-3 max-w-2xl text-base leading-relaxed text-brand-foreground/90 sm:text-lg">
-              Free hot meals for children across Lagos every December. Your donation puts a plate in a small hand.
+              Place your order on Chowdeck and get Chef Tye delivered straight to your door.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
-            <Link to="/donate" className="rounded-full bg-charcoal px-7 py-3.5 text-sm font-black uppercase tracking-widest text-cream shadow-lg transition-all hover:-translate-y-0.5 hover:bg-charcoal/90">
-              Donate Now
-            </Link>
-            <Link to="/charity" className="btn-outline" style={{ borderColor: "var(--cream)", color: "var(--cream)" }}>Learn More</Link>
+            <a
+              href={ORDER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-charcoal px-7 py-3.5 text-sm font-black uppercase tracking-widest text-cream shadow-lg transition-all hover:-translate-y-0.5 hover:bg-charcoal/90"
+            >
+              Order on Chowdeck
+            </a>
+            <Link to="/menu" className="btn-outline" style={{ borderColor: "var(--cream)", color: "var(--cream)" }}>View Menu</Link>
           </div>
         </div>
       </section>

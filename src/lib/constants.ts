@@ -17,7 +17,7 @@ export const CONTACT_PHONE_DISPLAY = "08118615254";
 export const CONTACT_PHONE_TEL = "+2348118615254";
 export const WHATSAPP_DISPLAY = "+234 811 861 5254";
 export const WHATSAPP_URL = "https://wa.me/2348118615254";
-export const CONTACT_EMAIL = "tyeontemper@gmail.com";
+export const CONTACT_EMAIL = "Adebola.tye@gmail.com";
 export const LOCATION = "Lagos, Nigeria";
 export const LOCATION_SHORT = "Lagos, NG";
 export const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Lagos%2C+Nigeria";

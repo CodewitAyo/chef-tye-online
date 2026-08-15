@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
+import logoAsset from "@/assets/chef-tye-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ScrollToTop } from "@/components/site/ScrollToTop";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -85,7 +86,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: logoAsset.url, type: "image/png" },
+      { rel: "apple-touch-icon", href: logoAsset.url },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
