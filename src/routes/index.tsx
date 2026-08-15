@@ -3,7 +3,7 @@ import {
   ArrowRight, Instagram, ShoppingBag, Star, ChefHat, Users,
 } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import portraitAsset from "@/assets/chef-utensils.png.asset.json";
 import round2Asset from "@/assets/round-2.png.asset.json";
