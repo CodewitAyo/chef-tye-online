@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Sparkles, Trophy, Gift, Crown, ChefHat, ShieldCheck, Loader2 } from "lucide-react";
-import { ORDER_URL } from "@/lib/constants";
+import { ORDER_URL, isValidPhone } from "@/lib/constants";
 import { tierFor, type TierName } from "@/lib/loyalty";
 import { getDashboard, redeemReward } from "@/lib/loyalty.functions";
 
@@ -26,6 +26,7 @@ function AccountPage() {
   const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
+  const [original, setOriginal] = useState({ fullName: "", displayName: "", phone: "" });
   const [saving, setSaving] = useState(false);
   const [redeeming, setRedeeming] = useState<string | null>(null);
 
@@ -37,24 +38,42 @@ function AccountPage() {
 
   useEffect(() => {
     if (dashboard.data?.profile) {
-      setFullName(dashboard.data.profile.full_name ?? "");
-      setDisplayName(dashboard.data.profile.display_name ?? "");
-      setPhone(dashboard.data.profile.phone ?? "");
+      const p = dashboard.data.profile;
+      setFullName(p.full_name ?? "");
+      setDisplayName(p.display_name ?? "");
+      setPhone(p.phone ?? "");
+      setOriginal({ fullName: p.full_name ?? "", displayName: p.display_name ?? "", phone: p.phone ?? "" });
     }
   }, [dashboard.data?.profile]);
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
     if (!dashboard.data?.profile) return;
+    const trimmedFullName = fullName.trim().slice(0, 120);
+    const trimmedDisplayName = displayName.trim().slice(0, 60);
+    const trimmedPhone = phone.trim().slice(0, 40);
+    const unchanged =
+      trimmedFullName === original.fullName &&
+      trimmedDisplayName === original.displayName &&
+      trimmedPhone === original.phone;
+    if (unchanged) {
+      toast.info("Nothing to save — no changes made.");
+      return;
+    }
+    if (!isValidPhone(trimmedPhone)) {
+      toast.error("That phone number doesn't look right. Use digits, spaces, +, or ( ) only.");
+      return;
+    }
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
-      full_name: fullName.trim().slice(0, 120) || null,
-      display_name: displayName.trim().slice(0, 60) || null,
-      phone: phone.trim().slice(0, 40) || null,
+      full_name: trimmedFullName || null,
+      display_name: trimmedDisplayName || null,
+      phone: trimmedPhone || null,
     }).eq("id", dashboard.data.profile.id);
     setSaving(false);
     if (error) return toast.error("Couldn't save. Try again.");
     toast.success("Profile updated.");
+    setOriginal({ fullName: trimmedFullName, displayName: trimmedDisplayName, phone: trimmedPhone });
     qc.invalidateQueries({ queryKey: ["dashboard"] });
   }
 
@@ -201,7 +220,7 @@ function AccountPage() {
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone (optional)</span>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={40} placeholder="+234…" className="mt-1 w-full rounded-xl border-2 border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand" />
           </label>
-          <button type="submit" disabled={saving} className="btn-primary mt-5 w-full justify-center disabled:opacity-60">
+          <button type="submit" disabled={saving || (fullName.trim().slice(0, 120) === original.fullName && displayName.trim().slice(0, 60) === original.displayName && phone.trim().slice(0, 40) === original.phone)} className="btn-primary mt-5 w-full justify-center disabled:opacity-60">
             {saving ? "Saving…" : "Save changes"}
           </button>
 
@@ -228,7 +247,7 @@ function AccountPage() {
               <div className="text-xs font-black uppercase tracking-widest text-brand">{r.points_cost} pts · {r.tier_required ?? "Any tier"}</div>
               <div className="mt-1 text-lg font-bold">{r.name}</div>
               <p className="mt-1 text-sm text-muted-foreground">{r.description}</p>
-              <button onClick={() => handleRedeem(r.id, r.name)} disabled={redeeming === r.id} className="btn-primary mt-4 disabled:opacity-60">
+              <button onClick={() => handleRedeem(r.id, r.name)} disabled={redeeming === r.id} className="btn-primary mt-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
                 {redeeming === r.id ? <Loader2 className="animate-spin" size={14} /> : null} Redeem
               </button>
             </div>

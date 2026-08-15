@@ -17,6 +17,34 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
+function describeAuditEntry(a: {
+  action: string;
+  target_id: string | null;
+  after?: Record<string, unknown> | null;
+}): string {
+  const after = a.after ?? {};
+  switch (a.action) {
+    case "order.admin_add": {
+      const subtotal = typeof after.subtotalNgn === "number" ? `₦${after.subtotalNgn.toLocaleString()}` : "an order";
+      const source = typeof after.source === "string" ? ` via ${after.source}` : "";
+      return `Manually logged ${subtotal}${source}`;
+    }
+    case "points.adjust": {
+      const delta = typeof after.delta === "number" ? after.delta : null;
+      if (delta === null) return "Adjusted a member's points";
+      return delta >= 0 ? `Added ${delta} points to a member` : `Removed ${Math.abs(delta)} points from a member`;
+    }
+    case "redemption.honor":
+      return "Marked a reward redemption as honored";
+    case "reward.redeem": {
+      const cost = typeof after.points_cost === "number" ? ` for ${after.points_cost} points` : "";
+      return `Member redeemed a reward${cost}`;
+    }
+    default:
+      return a.action;
+  }
+}
+
 function AdminCodeGate({ onVerified }: { onVerified: () => void }) {
   const verify = useServerFn(verifyAdminCode);
   const [code, setCode] = useState("");
@@ -188,11 +216,14 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
             </select>
             <div className="grid grid-cols-2 gap-2">
               <input required type="number" min={0} placeholder="Subtotal ₦" value={orderForm.subtotalNgn} onChange={(e) => setOrderForm({ ...orderForm, subtotalNgn: e.target.value })} className="rounded-xl border-2 border-border bg-background px-3 py-2" />
-              <input type="number" min={0} placeholder="Delivery ₦" value={orderForm.deliveryFeeNgn} onChange={(e) => setOrderForm({ ...orderForm, deliveryFeeNgn: e.target.value })} className="rounded-xl border-2 border-border bg-background px-3 py-2" />
+              <input required type="number" min={0} placeholder="Delivery ₦" value={orderForm.deliveryFeeNgn} onChange={(e) => setOrderForm({ ...orderForm, deliveryFeeNgn: e.target.value })} className="rounded-xl border-2 border-border bg-background px-3 py-2" />
             </div>
-            <input type="datetime-local" value={orderForm.occurredAt} onChange={(e) => setOrderForm({ ...orderForm, occurredAt: e.target.value })} className="w-full rounded-xl border-2 border-border bg-background px-3 py-2" />
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold uppercase tracking-widest text-muted-foreground">Order date & time</span>
+              <input required type="datetime-local" value={orderForm.occurredAt} onChange={(e) => setOrderForm({ ...orderForm, occurredAt: e.target.value })} className="w-full rounded-xl border-2 border-border bg-background px-3 py-2.5 text-sm text-foreground [color-scheme:light] dark:[color-scheme:dark]" />
+            </label>
             <input placeholder="External ref (Chowdeck ID, WA thread…)" value={orderForm.externalRef} onChange={(e) => setOrderForm({ ...orderForm, externalRef: e.target.value })} className="w-full rounded-xl border-2 border-border bg-background px-3 py-2" />
-            <textarea placeholder="Note / reason (visible in audit log)" value={orderForm.note} onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })} className="min-h-[70px] w-full rounded-xl border-2 border-border bg-background px-3 py-2" />
+            <textarea required placeholder="Note / reason (visible in audit log)" value={orderForm.note} onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })} className="min-h-[70px] w-full rounded-xl border-2 border-border bg-background px-3 py-2" />
             <button disabled={busy === "order"} className="btn-primary w-full justify-center disabled:opacity-60">
               {busy === "order" ? <Loader2 className="animate-spin" size={14} /> : null} Add order
             </button>
@@ -272,9 +303,9 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
         <ul className="mt-4 divide-y divide-border rounded-2xl border border-border text-sm">
           {data.audit.map((a) => (
             <li key={a.id} className="p-4">
-              <div className="font-bold">{a.action}</div>
-              <div className="text-xs text-muted-foreground">{a.target_table}/{a.target_id ?? "—"} · {new Date(a.created_at).toLocaleString()}</div>
-              {a.note && <div className="mt-1 text-xs">{a.note}</div>}
+              <div className="font-bold">{describeAuditEntry(a)}</div>
+              <div className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString()}</div>
+              {a.note && <div className="mt-1 text-xs">Note: {a.note}</div>}
             </li>
           ))}
           {data.audit.length === 0 && (<li className="p-4 text-center text-muted-foreground">No activity yet.</li>)}

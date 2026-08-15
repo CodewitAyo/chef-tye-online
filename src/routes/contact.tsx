@@ -12,7 +12,7 @@ import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL,
   INSTAGRAM_HANDLE_PRIMARY, INSTAGRAM_PRIMARY, X_HANDLE_PRIMARY, X_PRIMARY,
-  WHATSAPP_URL, WHATSAPP_DISPLAY, LOCATION,
+  WHATSAPP_URL, WHATSAPP_DISPLAY, LOCATION, isValidPhone,
 } from "@/lib/constants";
 import { WhatsappIcon } from "@/components/site/WhatsappIcon";
 
@@ -61,10 +61,10 @@ function ContactPage() {
   const mutation = useMutation({
     mutationFn: submit,
     onSuccess: () => {
-      toast.success("Message sent! Chef Tye's team will respond within 24 hours.");
+      toast.success("Message sent! Chef Tye's team will respond within 72 hours.");
       setState((s) => ({ ...s, message: "", subject: typeMeta[s.type].subject }));
     },
-    onError: (e: Error) => toast.error(e.message || "Something went wrong."),
+    onError: (e: Error) => toast.error(e.message || "Couldn't send your message — check your details and try again, or reach us directly using the contact info on this page."),
   });
 
   function setType(t: FormState["type"]) {
@@ -78,6 +78,10 @@ function ContactPage() {
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (state.phone.trim() && !isValidPhone(state.phone)) {
+      toast.error("That phone number doesn't look right. Use digits, spaces, +, or ( ) only, or leave it blank.");
+      return;
+    }
     mutation.mutate({
       data: {
         type: state.type,
@@ -101,7 +105,7 @@ function ContactPage() {
             LET'S <span className="text-brand">TALK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Catering, private dinners, brand collabs or press. Drop a message and Chef Tye's team will respond within 24 hours. Looking to support Feed The Streets? Head to the donate page.
+            Catering, private dinners, brand collabs or press. Drop a message and Chef Tye's team will respond within 72 hours. Looking to support Feed The Streets? Head to the donate page.
           </p>
         </div>
       </section>

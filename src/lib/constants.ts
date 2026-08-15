@@ -13,7 +13,7 @@ export const X_PRIMARY = "https://x.com/tye_chef";
 export const X_HANDLE_PRIMARY = "@tye_chef";
 
 // Contact
-export const CONTACT_PHONE_DISPLAY = "+08118615254";
+export const CONTACT_PHONE_DISPLAY = "08118615254";
 export const CONTACT_PHONE_TEL = "+2348118615254";
 export const WHATSAPP_DISPLAY = "+234 811 861 5254";
 export const WHATSAPP_URL = "https://wa.me/2348118615254";
@@ -21,3 +21,12 @@ export const CONTACT_EMAIL = "tyeontemper@gmail.com";
 export const LOCATION = "Lagos, Nigeria";
 export const LOCATION_SHORT = "Lagos, NG";
 export const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Lagos%2C+Nigeria";
+
+// Phone fields: digits, spaces, and + - ( ) only, at least 7 digits total.
+export const PHONE_PATTERN = /^[+()\d][\d\s\-()]{6,39}$/;
+export function isValidPhone(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed) return true; // optional fields stay optional
+  const digitCount = (trimmed.match(/\d/g) ?? []).length;
+  return PHONE_PATTERN.test(trimmed) && digitCount >= 7;
+}

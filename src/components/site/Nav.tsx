@@ -26,6 +26,10 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  function scrollToTop() {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }
+
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
@@ -43,7 +47,7 @@ export function Nav() {
           <div className="min-w-0 leading-tight">
             <div className="text-display text-xl text-cream sm:text-2xl">CHEF TYE</div>
             <div className="truncate text-[10px] font-semibold uppercase tracking-[0.25em] text-brand">
-              Private Chef · Lagos
+              Private Chef · Lagos, NG
             </div>
           </div>
         </Link>
@@ -53,6 +57,7 @@ export function Nav() {
             <Link
               key={l.to}
               to={l.to}
+              onClick={scrollToTop}
               activeOptions={{ exact: l.to === "/" }}
               activeProps={{ className: "text-brand" }}
               inactiveProps={{ className: "text-cream/85" }}
@@ -102,7 +107,7 @@ export function Nav() {
                 activeOptions={{ exact: l.to === "/" }}
                 activeProps={{ className: "bg-brand/15 text-brand" }}
                 inactiveProps={{ className: "text-cream/90" }}
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); scrollToTop(); }}
                 className="rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-wider transition-colors hover:bg-cream/10"
               >
                 {l.label}

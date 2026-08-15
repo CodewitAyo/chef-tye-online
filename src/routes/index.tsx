@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowRight, Instagram, ShoppingBag, Heart, Star, ChefHat, MapPin, Users,
+  ArrowRight, Instagram, ShoppingBag, Heart, Star, ChefHat, Users,
 } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import superstarAsset from "@/assets/superstar-meal.png.asset.json";
 import meal2Asset from "@/assets/meal-2.png.asset.json";
 import chowdeckAsset from "@/assets/chowdeck.png.asset.json";
 import lustAsset from "@/assets/lust.png.asset.json";
-import { ORDER_URL, INSTAGRAM_PRIMARY, INSTAGRAM_HANDLE_PRIMARY, MAPS_URL } from "@/lib/constants";
+import { ORDER_URL, INSTAGRAM_PRIMARY, INSTAGRAM_HANDLE_PRIMARY } from "@/lib/constants";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -42,7 +42,6 @@ const carouselSlides: Slide[] = [
 ];
 
 function MealCarousel() {
-  const navigate = useNavigate();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selected, setSelected] = useState(0);
 
@@ -61,37 +60,31 @@ function MealCarousel() {
     <div className="relative">
       <div className="overflow-hidden rounded-3xl bg-charcoal shadow-2xl" ref={emblaRef}>
         <div className="flex">
-          {carouselSlides.map((s) => {
-            const inner = (
-              <>
-                <div className="aspect-[3/4] w-full overflow-hidden">
-                  <img src={s.src} alt={s.alt} className="h-full w-full object-cover" />
-                </div>
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/60 to-transparent p-5 text-cream">
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-brand">{s.tag}</div>
-                    <div className="text-display text-2xl leading-tight">{s.label}</div>
-                  </div>
-                </div>
-              </>
-            );
-            return (
-              <div key={s.label} className="relative min-w-0 flex-[0_0_100%]">
-                {s.itemId ? (
-                  <button
-                    type="button"
-                    onClick={() => navigate({ to: "/menu", search: { item: s.itemId } })}
-                    className="relative block h-full w-full cursor-pointer text-left"
-                    aria-label={`See ${s.label} on the menu`}
-                  >
-                    {inner}
-                  </button>
-                ) : (
-                  <div className="relative">{inner}</div>
-                )}
+          {carouselSlides.map((s) => (
+            <div key={s.label} className="relative min-w-0 flex-[0_0_100%]">
+              <div className="aspect-[3/4] w-full overflow-hidden">
+                <img src={s.src} alt={s.alt} className="h-full w-full object-cover" />
               </div>
-            );
-          })}
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/60 to-transparent p-5 text-cream">
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-brand">{s.tag}</div>
+                  <div className="text-display text-2xl leading-tight">{s.label}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => emblaApi?.scrollPrev()}
+                aria-label="Previous slide"
+                className="absolute inset-y-0 left-0 w-1/2 cursor-default"
+              />
+              <button
+                type="button"
+                onClick={() => emblaApi?.scrollNext()}
+                aria-label="Next slide"
+                className="absolute inset-y-0 right-0 w-1/2 cursor-default"
+              />
+            </div>
+          ))}
         </div>
       </div>
       <div className="mt-4 flex items-center justify-center gap-2">
@@ -127,12 +120,8 @@ function HomePage() {
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 md:grid-cols-[1.15fr_1fr] md:py-24">
           <div>
-            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-cream/80 backdrop-blur transition-colors hover:border-brand hover:text-brand">
-              <MapPin size={14} className="text-brand" /> Private Chef · Lagos, NG
-            </a>
-            <h1 className="mt-6 text-display text-6xl leading-[0.9] sm:text-7xl md:text-[6.5rem]">
-              THERE'LL BE<br /><span className="text-brand">ROUND 2.</span>
+            <h1 className="text-display text-6xl leading-[0.9] sm:text-7xl md:text-[6.5rem]">
+              LET'S SEE WHAT THE<br /><span className="text-brand">HYPE IS ALL ABOUT.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-cream/80">
               I'm <span className="font-bold text-cream">Chef Tye</span>, a private chef in Lagos. I cook the kind of food you finish and immediately start planning to order again. Bold pastas, rice bowls and stir-fries, <span className="font-bold text-brand">every plate cooked by me personally</span>.
@@ -314,7 +303,7 @@ function HomePage() {
             <Link to="/donate" className="rounded-full bg-charcoal px-7 py-3.5 text-sm font-black uppercase tracking-widest text-cream shadow-lg transition-all hover:-translate-y-0.5 hover:bg-charcoal/90">
               Donate Now
             </Link>
-            <Link to="/charity" className="btn-outline" style={{ borderColor: "var(--charcoal)", color: "var(--charcoal)" }}>Learn More</Link>
+            <Link to="/charity" className="btn-outline" style={{ borderColor: "var(--cream)", color: "var(--cream)" }}>Learn More</Link>
           </div>
         </div>
       </section>

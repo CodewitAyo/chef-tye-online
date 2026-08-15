@@ -121,7 +121,7 @@ export function Footer() {
       <div className="border-t border-cream/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-5 text-xs text-cream/50 sm:flex-row sm:px-8">
           <span>© {new Date().getFullYear()} Chef Tye. All rights reserved.</span>
-          <span className="uppercase tracking-widest">There'll Be Round 2.</span>
+          <span className="uppercase tracking-widest">Let's see what the hype is all about.</span>
           <div className="flex items-center gap-2 text-cream/60">
             <span className="text-[10px] uppercase tracking-[0.25em]">Built by</span>
             <img

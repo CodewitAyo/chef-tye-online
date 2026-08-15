@@ -75,10 +75,10 @@ const addOrderInput = z.object({
   userEmail: z.string().email(),
   source: z.enum(["online", "whatsapp", "instagram", "offline", "manual_past", "other"]),
   subtotalNgn: z.number().int().min(0).max(100_000_000),
-  deliveryFeeNgn: z.number().int().min(0).max(10_000_000).default(0),
-  occurredAt: z.string().optional(),
+  deliveryFeeNgn: z.number().int().min(0).max(10_000_000),
+  occurredAt: z.string().min(1, "Order date is required."),
   externalRef: z.string().max(120).optional(),
-  note: z.string().max(1000).optional(),
+  note: z.string().trim().min(1, "Note is required.").max(1000),
 });
 
 async function requireAdmin(supabase: unknown, userId: string) {
@@ -224,7 +224,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         .limit(30),
       db
         .from("audit_log")
-        .select("id, actor_id, action, target_table, target_id, note, created_at")
+        .select("id, actor_id, action, target_table, target_id, note, after, created_at")
         .order("created_at", { ascending: false })
         .limit(30),
     ]);
