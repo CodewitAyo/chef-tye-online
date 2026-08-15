@@ -64,10 +64,10 @@ function MenuPage() {
                 {c.tag ?? "On The Menu"}
               </div>
               <div className="mt-2 flex items-baseline justify-between gap-4">
-                <h3 className="text-display text-3xl">{c.name}</h3>
-                <span className="text-display text-2xl text-brand">{c.price}</span>
+                <h3 className="min-w-0 truncate text-display text-3xl">{c.name}</h3>
+                <span className="shrink-0 text-display text-3xl font-bold text-brand">{c.price}</span>
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">{c.short}</p>
+              <p className="mt-2 truncate text-xs text-muted-foreground">{c.short}</p>
               <a
                 href={ORDER_URL}
                 target="_blank"
