@@ -150,7 +150,7 @@ function HomePage() {
           <div className="absolute -bottom-32 -right-16 h-[28rem] w-[28rem] rounded-full bg-brand/60 blur-3xl" />
         </div>
         <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1.15fr_1fr] md:py-20">
-          <div>
+          <div className="order-2 md:order-1">
             <h1 className="text-display text-5xl leading-[0.9] sm:text-7xl md:text-[6.5rem]">
               LET'S SEE WHAT THE<br /><span className="text-brand">HYPE IS ALL ABOUT.</span>
             </h1>
@@ -171,7 +171,7 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md">
+          <div className="relative order-1 mx-auto w-full max-w-md md:order-2">
             <MealCarousel />
             <div className="absolute -bottom-6 -left-6 hidden rotate-[-6deg] rounded-2xl bg-cream px-5 py-3 text-charcoal shadow-xl sm:block">
               <div className="text-script text-2xl leading-none text-brand">Chef Tye.</div>
@@ -231,26 +231,6 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="bg-cream/60 py-10 md:py-16">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 sm:px-8 md:grid-cols-[1.4fr_auto]">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-brand/15 px-3 py-1 text-xs font-black uppercase tracking-widest text-brand">
-              <Users size={14} /> Loyalty and Rewards
-            </div>
-            <h2 className="mt-3 text-display text-4xl leading-[0.95] sm:text-6xl">
-              Join the elites. <span className="text-brand">Earn on every plate.</span>
-            </h2>
-            <p className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Free account, <strong>1 point for every ₦1,000</strong> you spend. Free sides, VIP perks, and a year-end prize.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3 md:justify-end">
-            <Link to="/join" className="btn-primary">See the perks</Link>
-            <Link to="/auth" search={{ mode: "signup", next: "/account" }} className="btn-outline">Sign up free <ArrowRight size={16} /></Link>
-          </div>
-        </div>
-      </section>
-
       <section className="py-12 md:py-20">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -300,6 +280,26 @@ function HomePage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-cream/60 py-10 md:py-16">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 sm:px-8 md:grid-cols-[1.4fr_auto]">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand/15 px-3 py-1 text-xs font-black uppercase tracking-widest text-brand">
+              <Users size={14} /> Loyalty and Rewards
+            </div>
+            <h2 className="mt-3 text-display text-4xl leading-[0.95] sm:text-6xl">
+              Join the elites. <span className="text-brand">Earn on every plate.</span>
+            </h2>
+            <p className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">
+              Free account, <strong>1 point for every ₦1,000</strong> you spend. Free sides, VIP perks, and a year-end prize.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 md:justify-end">
+            <Link to="/join" className="btn-primary">See the perks</Link>
+            <Link to="/auth" search={{ mode: "signup", next: "/account" }} className="btn-outline">Sign up free <ArrowRight size={16} /></Link>
           </div>
         </div>
       </section>
