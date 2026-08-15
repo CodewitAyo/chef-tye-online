@@ -12,6 +12,7 @@ import meal2Asset from "@/assets/meal-2.png.asset.json";
 import chowdeckAsset from "@/assets/chowdeck.png.asset.json";
 import lustAsset from "@/assets/lust.png.asset.json";
 import { ORDER_URL, INSTAGRAM_PRIMARY, INSTAGRAM_HANDLE_PRIMARY } from "@/lib/constants";
+import { findMenuItem } from "@/lib/menu-data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
