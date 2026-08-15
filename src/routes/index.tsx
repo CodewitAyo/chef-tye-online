@@ -42,17 +42,22 @@ const carouselSlides: Slide[] = [
   { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck", tag: "Order Online" },
 ];
 
+const AUTOPLAY_MS = 4500;
+const RESUME_IDLE_MS = 2500;
+
 function MealCarousel() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "center",
-    duration: 22,
-    dragThreshold: 6,
+    duration: 20,
+    dragThreshold: 3,
     skipSnaps: false,
     containScroll: false,
     watchDrag: true,
   });
   const [selected, setSelected] = useState(0);
+  const interacting = useRef(false);
+  const idleUntil = useRef(0);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -60,24 +65,55 @@ function MealCarousel() {
     emblaApi.on("select", onSelect);
     onSelect();
 
-    let paused = false;
-    const pause = () => { paused = true; };
-    const resume = () => { paused = false; };
-    emblaApi.on("pointerDown", pause);
-    emblaApi.on("pointerUp", resume);
-    emblaApi.on("settle", resume);
+    const node = emblaApi.rootNode();
 
-    const id = setInterval(() => { if (!paused) emblaApi.scrollNext(); }, 4500);
+    // Any active pointer contact blocks autoplay for as long as the finger is
+    // down; `settle` is intentionally NOT used to resume (it can fire while the
+    // user is still holding without dragging).
+    const onDown = () => {
+      interacting.current = true;
+      idleUntil.current = Date.now() + RESUME_IDLE_MS;
+    };
+    const onUp = () => {
+      interacting.current = false;
+      idleUntil.current = Date.now() + RESUME_IDLE_MS;
+    };
+
+    node.addEventListener("pointerdown", onDown, { passive: true });
+    node.addEventListener("touchstart", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp, { passive: true });
+    window.addEventListener("pointercancel", onUp, { passive: true });
+    window.addEventListener("touchend", onUp, { passive: true });
+    window.addEventListener("touchcancel", onUp, { passive: true });
+    emblaApi.on("pointerDown", onDown);
+    emblaApi.on("pointerUp", onUp);
+
+    const id = setInterval(() => {
+      if (interacting.current) return;
+      if (Date.now() < idleUntil.current) return;
+      if (document.hidden) return;
+      emblaApi.scrollNext();
+    }, AUTOPLAY_MS);
+
     return () => {
       clearInterval(id);
       emblaApi.off("select", onSelect);
-      emblaApi.off("pointerDown", pause);
-      emblaApi.off("pointerUp", resume);
-      emblaApi.off("settle", resume);
+      emblaApi.off("pointerDown", onDown);
+      emblaApi.off("pointerUp", onUp);
+      node.removeEventListener("pointerdown", onDown);
+      node.removeEventListener("touchstart", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      window.removeEventListener("touchend", onUp);
+      window.removeEventListener("touchcancel", onUp);
     };
   }, [emblaApi]);
 
-  const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
+  const scrollTo = useCallback((i: number) => {
+    idleUntil.current = Date.now() + RESUME_IDLE_MS;
+    emblaApi?.scrollTo(i);
+  }, [emblaApi]);
+
 
   return (
     <div className="relative">
