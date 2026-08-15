@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  ArrowRight, Instagram, ShoppingBag, Heart, Star, ChefHat, Users,
+  ArrowRight, Instagram, ShoppingBag, Star, ChefHat, Users,
 } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
@@ -317,31 +317,6 @@ function HomePage() {
           <div className="flex flex-wrap gap-3 md:justify-end">
             <Link to="/join" className="btn-primary">See the perks</Link>
             <Link to="/auth" search={{ mode: "signup", next: "/account" }} className="btn-outline">Sign up free <ArrowRight size={16} /></Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-charcoal text-cream">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 sm:px-8 md:grid-cols-[1fr_1.1fr] md:py-20">
-          <div className="relative order-2 md:order-1">
-            <div className="overflow-hidden rounded-3xl">
-              <img src={portraitAsset.url} alt="Chef Tye in whites with utensils" className="aspect-[3/4] w-full object-cover" />
-            </div>
-            <div className="absolute -bottom-4 -right-4 rounded-2xl bg-brand px-5 py-3 text-brand-foreground shadow-xl">
-              <div className="text-display text-2xl leading-none">Chef Tye</div>
-              <div className="text-[10px] font-bold uppercase tracking-widest">Every plate, by hand</div>
-            </div>
-          </div>
-          <div className="order-1 md:order-2">
-            <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">The Story</div>
-            <h2 className="mt-2 text-display text-4xl sm:text-6xl">Built from the grind.</h2>
-            <p className="mt-4 text-base leading-relaxed text-cream/80 sm:text-lg">
-              Chef Tye started in a university kitchen with one goal: build something of his own and lift some weight off his family. Every meal is still cooked by him personally.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/story" className="btn-primary">Read the story <ArrowRight size={16} /></Link>
-              <Link to="/charity" className="btn-ghost-cream"><Heart size={16} /> Feed The Streets</Link>
-            </div>
           </div>
         </div>
       </section>

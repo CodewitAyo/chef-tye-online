@@ -37,16 +37,16 @@ export function Nav() {
       }`}
       style={{ backgroundColor: scrolled ? undefined : "var(--charcoal)" }}
     >
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3 sm:px-8">
-        <Link to="/" className="flex min-w-0 items-center gap-3 group" onClick={() => setOpen(false)}>
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3 sm:px-8 lg:grid-cols-[minmax(300px,1fr)_auto]">
+        <Link to="/" className="flex items-center gap-3 group" onClick={() => setOpen(false)}>
           <img
             src={logoAsset.url}
             alt="Chef Tye logo"
             className="h-11 w-11 shrink-0 rounded-full bg-cream object-cover ring-2 ring-brand/60 transition-transform group-hover:scale-105"
           />
-          <div className="min-w-0 leading-tight">
+          <div className="leading-tight">
             <div className="text-display text-xl text-cream sm:text-2xl">CHEF TYE</div>
-            <div className="truncate text-[10px] font-semibold uppercase tracking-[0.25em] text-brand">
+            <div className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.25em] text-brand">
               Private Chef · Lagos, NG
             </div>
           </div>
