@@ -42,7 +42,15 @@ const carouselSlides: Slide[] = [
 ];
 
 function MealCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "center",
+    duration: 22,
+    dragThreshold: 6,
+    skipSnaps: false,
+    containScroll: false,
+    watchDrag: true,
+  });
   const [selected, setSelected] = useState(0);
 
   useEffect(() => {
@@ -50,20 +58,37 @@ function MealCarousel() {
     const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
     emblaApi.on("select", onSelect);
     onSelect();
-    const id = setInterval(() => emblaApi?.scrollNext(), 4000);
-    return () => { clearInterval(id); emblaApi.off("select", onSelect); };
+
+    let paused = false;
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+    emblaApi.on("pointerDown", pause);
+    emblaApi.on("pointerUp", resume);
+    emblaApi.on("settle", resume);
+
+    const id = setInterval(() => { if (!paused) emblaApi.scrollNext(); }, 4500);
+    return () => {
+      clearInterval(id);
+      emblaApi.off("select", onSelect);
+      emblaApi.off("pointerDown", pause);
+      emblaApi.off("pointerUp", resume);
+      emblaApi.off("settle", resume);
+    };
   }, [emblaApi]);
 
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
   return (
     <div className="relative">
-      <div className="overflow-hidden rounded-3xl bg-charcoal shadow-2xl" ref={emblaRef}>
-        <div className="flex">
+      <div
+        className="overflow-hidden rounded-3xl bg-charcoal shadow-2xl [touch-action:pan-y_pinch-zoom] [-webkit-tap-highlight-color:transparent]"
+        ref={emblaRef}
+      >
+        <div className="flex [backface-visibility:hidden] [touch-action:pan-y_pinch-zoom]">
           {carouselSlides.map((s) => (
-            <div key={s.label} className="relative min-w-0 flex-[0_0_100%]">
+            <div key={s.label} className="relative min-w-0 flex-[0_0_100%] [transform:translate3d(0,0,0)]">
               <div className="aspect-[3/4] w-full overflow-hidden">
-                <img src={s.src} alt={s.alt} className="h-full w-full object-cover" />
+                <img src={s.src} alt={s.alt} draggable={false} className="h-full w-full select-none object-cover" />
               </div>
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/60 to-transparent p-5 text-cream">
                 <div>
@@ -102,14 +127,19 @@ function MealCarousel() {
 }
 
 function HomePage() {
-  const galleryItems: { src: string; alt: string; label: string; itemId?: string }[] = [
+  const galleryItems: {
+    src: string; alt: string; label: string; itemId?: string; price?: string; short?: string;
+  }[] = [
     { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", itemId: "asap" },
     { src: meal2Asset.url, alt: "Holy Grail pasta", label: "Holy Grail", itemId: "holy-grail" },
     { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef" },
     { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", itemId: "lust" },
     { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "Round 2" },
     { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck" },
-  ];
+  ].map((it) => {
+    const m = findMenuItem(it.itemId);
+    return m ? { ...it, price: m.price, short: m.short } : it;
+  });
 
   return (
     <SiteLayout>
@@ -232,14 +262,24 @@ function HomePage() {
             </a>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-8 lg:grid-cols-3">
             {galleryItems.map((it) => {
               const inner = (
                 <>
-                  <img src={it.src} alt={it.alt} className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-charcoal/90 to-transparent p-4 pt-10 text-cream">
-                    <span className="text-sm font-bold uppercase tracking-widest">{it.label}</span>
-                    <ArrowRight size={16} className="translate-x-[-6px] text-brand opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                  <div className="overflow-hidden">
+                    <img src={it.src} alt={it.alt} className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  </div>
+                  <div className="flex items-start justify-between gap-3 p-4">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-display text-2xl leading-none text-foreground">{it.label}</h3>
+                      {it.price && (
+                        <div className="mt-1.5 text-display text-2xl leading-none text-brand">{it.price}</div>
+                      )}
+                      {it.short && (
+                        <p className="mt-1.5 truncate text-xs text-muted-foreground">{it.short}</p>
+                      )}
+                    </div>
+                    <ArrowRight size={16} className="mt-1 shrink-0 translate-x-[-6px] text-brand opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                   </div>
                 </>
               );
@@ -248,13 +288,13 @@ function HomePage() {
                   key={it.label}
                   to="/menu"
                   search={{ item: it.itemId }}
-                  className="group relative block overflow-hidden rounded-2xl bg-charcoal"
+                  className="group block overflow-hidden rounded-2xl bg-card ring-1 ring-border"
                   aria-label={`See ${it.label} on the menu`}
                 >
                   {inner}
                 </Link>
               ) : (
-                <div key={it.label} className="group relative overflow-hidden rounded-2xl bg-charcoal">
+                <div key={it.label} className="group overflow-hidden rounded-2xl bg-card ring-1 ring-border">
                   {inner}
                 </div>
               );
