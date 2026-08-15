@@ -1,15 +1,12 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { MenuItemDialog } from "@/components/site/MenuItemDialog";
-import { ShoppingBag, Flame, Star, Image as ImageIcon } from "lucide-react";
-import { MENU_ITEMS, FULL_MENU_IMAGE } from "@/lib/menu-data";
+import { ShoppingBag, Flame, Star } from "lucide-react";
+import { MENU_ITEMS } from "@/lib/menu-data";
 import { ORDER_URL } from "@/lib/constants";
 
 const searchSchema = z.object({
   item: z.string().max(60).optional(),
-  full: z.enum(["1"]).optional(),
 });
 
 export const Route = createFileRoute("/menu")({
@@ -28,24 +25,6 @@ export const Route = createFileRoute("/menu")({
 const sections = ["Chef Tye Pasta", "Mains", "Extras"] as const;
 
 function MenuPage() {
-  const navigate = useNavigate({ from: "/menu" });
-  const search = useSearch({ from: "/menu" });
-  const [showFull, setShowFull] = useState(false);
-
-  useEffect(() => {
-    setShowFull(search.full === "1");
-  }, [search.full]);
-
-  function openFull() {
-    setShowFull(true);
-    navigate({ search: { full: "1" }, replace: false });
-  }
-  function closeDialog() {
-    setShowFull(false);
-    navigate({ search: {}, replace: false });
-  }
-
-
   const featured = MENU_ITEMS.filter((m) => ["holy-grail", "asap", "lust"].includes(m.id));
 
   return (
@@ -57,18 +36,15 @@ function MenuPage() {
             EAT WELL. <span className="text-brand">RUN IT BACK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Prices in Nigerian Naira. Available on Chowdeck (Chef Tye) or direct for catering. The menu shifts a little from time to time. DM for daily specials.
+            Prices in Nigerian Naira. Available on Chowdeck (Chef Tye) or direct for catering. The menu shifts a little from time to time.
           </p>
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-xs font-black uppercase tracking-widest text-brand-foreground">
-            <Flame size={14} /> Every meal hand-prepared by Chef Tye himself
+          <div className="mt-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-cream/70">
+            <Flame size={14} className="text-brand" /> Every meal hand-prepared by Chef Tye himself
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
               <ShoppingBag size={16} /> Order on Chowdeck
             </a>
-            <button type="button" onClick={openFull} className="btn-ghost-cream cursor-pointer">
-              <ImageIcon size={16} /> View Full Menu Flyer
-            </button>
           </div>
         </div>
       </section>
@@ -103,27 +79,6 @@ function MenuPage() {
             </div>
           </div>
         ))}
-
-
-        <button
-          type="button"
-          onClick={openFull}
-          className="card-lift group relative cursor-pointer overflow-hidden rounded-3xl bg-card text-left shadow-sm ring-1 ring-border md:col-span-2"
-        >
-          <div className="aspect-[16/9] w-full overflow-hidden bg-charcoal">
-            <img src={FULL_MENU_IMAGE} alt="Chef Tye full menu flyer" className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </div>
-          <div className="p-6">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand">
-              <ImageIcon size={12} /> Menu Flyer
-            </div>
-            <div className="mt-2 flex items-baseline justify-between gap-4">
-              <h3 className="text-display text-3xl">The Full Menu</h3>
-              <span className="text-xs font-bold uppercase tracking-widest text-brand">Tap to enlarge</span>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">Full pasta, mains and add-ons on one page.</p>
-          </div>
-        </button>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-24 sm:px-8">
@@ -173,17 +128,10 @@ function MenuPage() {
                 Chef Tye caters intimate dinners, birthdays and corporate lunches around Lagos. Tell us what you need and we'll build a plate list around it.
               </p>
             </div>
-            <a href="/contact" className="btn-primary">Request Catering</a>
+            <a href="/contact?type=catering" className="btn-primary">Request Catering</a>
           </div>
         </div>
       </section>
-
-      <MenuItemDialog
-        item={null}
-        fullMenuImage={showFull ? FULL_MENU_IMAGE : null}
-        onClose={closeDialog}
-      />
-
     </SiteLayout>
   );
 }
