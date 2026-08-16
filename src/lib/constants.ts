@@ -30,3 +30,10 @@ export function isValidPhone(value: string): boolean {
   const digitCount = (trimmed.match(/\d/g) ?? []).length;
   return PHONE_PATTERN.test(trimmed) && digitCount >= 7;
 }
+
+// Strips anything that can never legally appear in a phone number (letters, @, #, etc.)
+// as the user types, so it's blocked at input time rather than only caught on submit.
+const PHONE_DISALLOWED_CHARS = /[^\d+()\-\s]/g;
+export function sanitizePhoneInput(value: string): string {
+  return value.replace(PHONE_DISALLOWED_CHARS, "").slice(0, 40);
+}

@@ -12,7 +12,7 @@ import { submitInquiry } from "@/lib/inquiries.functions";
 import {
   CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL,
   INSTAGRAM_HANDLE_PRIMARY, INSTAGRAM_PRIMARY, X_HANDLE_PRIMARY, X_PRIMARY,
-  WHATSAPP_URL, WHATSAPP_DISPLAY, LOCATION, isValidPhone,
+  WHATSAPP_URL, WHATSAPP_DISPLAY, LOCATION, isValidPhone, sanitizePhoneInput,
 } from "@/lib/constants";
 import { WhatsappIcon } from "@/components/site/WhatsappIcon";
 
@@ -36,14 +36,21 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-type CateringFields = { date: string; guests: string; location: string; budget: string; details: string };
+type FormType = "contact" | "catering";
+
+// Every identity field (name/email/phone) plus the message content lives in its own
+// per-tab bucket. Nothing is shared at the top level of FormState, so switching between
+// General and Catering can never leak data from one into the other (CT-CONTACT-005).
+type GeneralForm = { name: string; email: string; phone: string; message: string };
+type CateringForm = {
+  name: string; email: string; phone: string;
+  date: string; guests: string; location: string; budget: string; details: string;
+};
 
 type FormState = {
-  type: "contact" | "catering";
-  name: string; email: string; phone: string; subject: string;
-  message: string; // General/contact free-text message
-  catering: CateringFields; // Catering form's own fields — kept separate from `message`
-  // so switching between General and Catering never carries text from one into the other (CT-CONTACT-005).
+  type: FormType;
+  general: GeneralForm;
+  catering: CateringForm;
 };
 
 const typeMeta = {
@@ -51,9 +58,10 @@ const typeMeta = {
   catering: { label: "Catering", icon: Utensils, subject: "Catering enquiry" },
 } as const;
 
-const EMPTY_CATERING: CateringFields = { date: "", guests: "", location: "", budget: "", details: "" };
+const EMPTY_GENERAL: GeneralForm = { name: "", email: "", phone: "", message: "" };
+const EMPTY_CATERING: CateringForm = { name: "", email: "", phone: "", date: "", guests: "", location: "", budget: "", details: "" };
 
-function buildCateringMessage(c: CateringFields): string {
+function buildCateringMessage(c: CateringForm): string {
   const lines = [
     "Hi Chef Tye, I'd love to book you for an event.",
     `Date: ${c.date}`,
@@ -69,15 +77,16 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Client-side validation so the server's Zod errors never reach the user as raw text (CT-BUG-007). */
 function validationError(s: FormState): string | null {
-  if (!s.name.trim()) return "Please enter your name.";
-  if (!s.email.trim() || !EMAIL_PATTERN.test(s.email.trim())) return "Please enter a valid email address.";
-  if (s.phone.trim() && !isValidPhone(s.phone)) {
+  const active = s.type === "catering" ? s.catering : s.general;
+  if (!active.name.trim()) return "Please enter your name.";
+  if (!active.email.trim() || !EMAIL_PATTERN.test(active.email.trim())) return "Please enter a valid email address.";
+  if (active.phone.trim() && !isValidPhone(active.phone)) {
     return "That phone number doesn't look right. Use digits, spaces, +, or ( ) only, or leave it blank.";
   }
   if (s.type === "catering") {
     if (!s.catering.date) return "Please select the event date.";
     if (!s.catering.guests.trim()) return "Please enter the number of guests.";
-  } else if (!s.message.trim()) {
+  } else if (!s.general.message.trim()) {
     return "Please enter a message.";
   }
   return null;
@@ -102,13 +111,11 @@ function getSubmitErrorMessage(error: unknown): string {
 
 function ContactPage() {
   const search = Route.useSearch();
-  const initialType: FormState["type"] = search.type ?? "contact";
+  const initialType: FormType = search.type ?? "contact";
 
   const [state, setState] = useState<FormState>({
     type: initialType,
-    name: "", email: "", phone: "",
-    subject: typeMeta[initialType].subject,
-    message: "",
+    general: EMPTY_GENERAL,
     catering: EMPTY_CATERING,
   });
 
@@ -117,15 +124,19 @@ function ContactPage() {
     mutationFn: submit,
     onSuccess: () => {
       toast.success("Message sent! Chef Tye's team will respond within 72 hours.");
-      setState((s) => ({ ...s, message: "", catering: EMPTY_CATERING, subject: typeMeta[s.type].subject }));
+      setState((s) => ({
+        ...s,
+        general: s.type === "contact" ? EMPTY_GENERAL : s.general,
+        catering: s.type === "catering" ? EMPTY_CATERING : s.catering,
+      }));
     },
     onError: (e: unknown) => toast.error(getSubmitErrorMessage(e)),
   });
 
-  function setType(t: FormState["type"]) {
-    // Deliberately does NOT touch `message` or `catering` — each type keeps its own
-    // independent state so switching tabs never carries text between them (CT-CONTACT-005).
-    setState((s) => ({ ...s, type: t, subject: typeMeta[t].subject }));
+  function setType(t: FormType) {
+    // Deliberately does NOT touch `general` or `catering` — each tab keeps its own
+    // fully independent state so switching tabs never carries data between them (CT-CONTACT-005).
+    setState((s) => ({ ...s, type: t }));
   }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -135,19 +146,20 @@ function ContactPage() {
       toast.error(err);
       return;
     }
+    const active = state.type === "catering" ? state.catering : state.general;
     mutation.mutate({
       data: {
         type: state.type,
-        name: state.name.trim(),
-        email: state.email.trim(),
-        phone: state.phone.trim(),
-        subject: state.subject.trim(),
-        message: state.type === "catering" ? buildCateringMessage(state.catering) : state.message.trim(),
+        name: active.name.trim(),
+        email: active.email.trim(),
+        phone: active.phone.trim(),
+        subject: typeMeta[state.type].subject,
+        message: state.type === "catering" ? buildCateringMessage(state.catering) : state.general.message.trim(),
       },
     });
   }
 
-
+  const active = state.type === "catering" ? state.catering : state.general;
 
   return (
     <SiteLayout>
@@ -166,12 +178,12 @@ function ContactPage() {
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 md:grid-cols-[1.3fr_1fr] md:py-24">
         <form onSubmit={onSubmit} className="rounded-3xl border-2 border-charcoal bg-card p-6 shadow-sm sm:p-10" noValidate>
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(typeMeta) as Array<FormState["type"]>).map((t) => {
+            {(Object.keys(typeMeta) as FormType[]).map((t) => {
               const Icon = typeMeta[t].icon;
-              const active = state.type === t;
+              const isActive = state.type === t;
               return (
                 <button type="button" key={t} onClick={() => setType(t)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${active ? "bg-brand text-brand-foreground shadow" : "bg-muted text-foreground/70 hover:bg-brand/15 hover:text-brand"}`}>
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${isActive ? "bg-brand text-brand-foreground shadow" : "bg-muted text-foreground/70 hover:bg-brand/15 hover:text-brand"}`}>
                   <Icon size={14} /> {typeMeta[t].label}
                 </button>
               );
@@ -180,16 +192,28 @@ function ContactPage() {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Field label="Full name" required>
-              <input required type="text" maxLength={120} value={state.name} onChange={(e) => setState({ ...state, name: e.target.value })} className="input" placeholder="Your name" />
+              <input required type="text" maxLength={120} value={active.name}
+                onChange={(e) => setState((s) => (s.type === "catering"
+                  ? { ...s, catering: { ...s.catering, name: e.target.value } }
+                  : { ...s, general: { ...s.general, name: e.target.value } }))}
+                className="input" placeholder="Your name" />
             </Field>
             <Field label="Email" required>
-              <input required type="email" maxLength={255} value={state.email} onChange={(e) => setState({ ...state, email: e.target.value })} className="input" placeholder="you@email.com" />
+              <input required type="email" maxLength={255} value={active.email}
+                onChange={(e) => setState((s) => (s.type === "catering"
+                  ? { ...s, catering: { ...s.catering, email: e.target.value } }
+                  : { ...s, general: { ...s.general, email: e.target.value } }))}
+                className="input" placeholder="you@email.com" />
             </Field>
             <Field label="Phone (optional)">
-              <input type="tel" maxLength={40} value={state.phone} onChange={(e) => setState({ ...state, phone: e.target.value })} className="input" placeholder="+234 ..." />
+              <input type="tel" inputMode="tel" maxLength={40} value={active.phone}
+                onChange={(e) => setState((s) => (s.type === "catering"
+                  ? { ...s, catering: { ...s.catering, phone: sanitizePhoneInput(e.target.value) } }
+                  : { ...s, general: { ...s.general, phone: sanitizePhoneInput(e.target.value) } }))}
+                className="input" placeholder="+234 ..." />
             </Field>
             <Field label="Subject">
-              <div className="input bg-muted/60 text-foreground/80">{state.subject}</div>
+              <div className="input bg-muted/60 text-foreground/80">{typeMeta[state.type].subject}</div>
             </Field>
 
           </div>
@@ -217,7 +241,7 @@ function ContactPage() {
               </div>
             ) : (
               <Field label="Message" required>
-                <textarea required rows={6} maxLength={5000} value={state.message} onChange={(e) => setState({ ...state, message: e.target.value })} className="input resize-y" placeholder="Tell Chef Tye what you're planning..." />
+                <textarea required rows={6} maxLength={5000} value={state.general.message} onChange={(e) => setState({ ...state, general: { ...state.general, message: e.target.value } })} className="input resize-y" placeholder="Tell Chef Tye what you're planning..." />
               </Field>
             )}
           </div>

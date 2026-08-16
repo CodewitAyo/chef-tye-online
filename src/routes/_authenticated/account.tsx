@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Sparkles, Trophy, Gift, Crown, ChefHat, ShieldCheck, Loader2 } from "lucide-react";
-import { ORDER_URL, isValidPhone } from "@/lib/constants";
+import { ORDER_URL, isValidPhone, sanitizePhoneInput } from "@/lib/constants";
 import { tierFor, type TierName } from "@/lib/loyalty";
 import { getDashboard, redeemReward } from "@/lib/loyalty.functions";
 
@@ -218,7 +218,7 @@ function AccountPage() {
           </label>
           <label className="mt-3 block">
             <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone (optional)</span>
-            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={40} placeholder="+234…" className="mt-1 w-full rounded-xl border-2 border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand" />
+            <input type="tel" value={phone} onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))} maxLength={40} placeholder="+234…" className="mt-1 w-full rounded-xl border-2 border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand" />
           </label>
           <button type="submit" disabled={saving || (fullName.trim().slice(0, 120) === original.fullName && displayName.trim().slice(0, 60) === original.displayName && phone.trim().slice(0, 40) === original.phone)} className="btn-primary mt-5 w-full justify-center disabled:opacity-60">
             {saving ? "Saving…" : "Save changes"}
