@@ -8,6 +8,7 @@ import { ShieldCheck, Loader2, Plus, ArrowUpDown, Check } from "lucide-react";
 import {
   adminAddOrder, adminAdjustPoints, adminHonorRedemption, getAdminOverview,
 } from "@/lib/loyalty.functions";
+import { OrderDateTimePicker } from "@/components/admin/OrderDateTimePicker";
 import { ORDER_SOURCES } from "@/lib/loyalty";
 import { verifyAdminCode } from "@/lib/admin-code.functions";
 import { getAdminToken, setAdminToken, clearAdminToken } from "@/lib/admin-token";
@@ -119,6 +120,10 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
 
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
+    if (!orderForm.occurredAt) {
+      toast.error("Please select the order date and time.");
+      return;
+    }
     setBusy("order");
     try {
       await addOrder({
@@ -223,7 +228,7 @@ function AdminConsole({ onCodeExpired }: { onCodeExpired: () => void }) {
             </div>
             <label className="block">
               <span className="mb-1 block text-xs font-bold uppercase tracking-widest text-muted-foreground">Order date & time</span>
-              <input required type="datetime-local" value={orderForm.occurredAt} onChange={(e) => setOrderForm({ ...orderForm, occurredAt: e.target.value })} className="w-full rounded-xl border-2 border-border bg-background px-3 py-2.5 text-sm text-foreground [color-scheme:light] dark:[color-scheme:dark]" />
+              <OrderDateTimePicker value={orderForm.occurredAt} onChange={(v) => setOrderForm({ ...orderForm, occurredAt: v })} />
             </label>
             <input placeholder="External ref (Chowdeck ID, WA thread…)" value={orderForm.externalRef} onChange={(e) => setOrderForm({ ...orderForm, externalRef: e.target.value })} className="w-full rounded-xl border-2 border-border bg-background px-3 py-2" />
             <textarea required placeholder="Note / reason (visible in audit log)" value={orderForm.note} onChange={(e) => setOrderForm({ ...orderForm, note: e.target.value })} className="min-h-[70px] w-full rounded-xl border-2 border-border bg-background px-3 py-2" />

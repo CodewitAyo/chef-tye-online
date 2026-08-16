@@ -36,15 +36,69 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
+type CateringFields = { date: string; guests: string; location: string; budget: string; details: string };
+
 type FormState = {
   type: "contact" | "catering";
-  name: string; email: string; phone: string; subject: string; message: string;
+  name: string; email: string; phone: string; subject: string;
+  message: string; // General/contact free-text message
+  catering: CateringFields; // Catering form's own fields — kept separate from `message`
+  // so switching between General and Catering never carries text from one into the other (CT-CONTACT-005).
 };
 
 const typeMeta = {
-  contact: { label: "General", icon: MessageCircle, subject: "Hey Chef Tye,", message: "" },
-  catering: { label: "Catering", icon: Utensils, subject: "Catering enquiry", message: "Hi Chef Tye, I'd love to book you for an event.\nDate:\nGuests:\nLocation:\nBudget:\n" },
+  contact: { label: "General", icon: MessageCircle, subject: "Hey Chef Tye," },
+  catering: { label: "Catering", icon: Utensils, subject: "Catering enquiry" },
 } as const;
+
+const EMPTY_CATERING: CateringFields = { date: "", guests: "", location: "", budget: "", details: "" };
+
+function buildCateringMessage(c: CateringFields): string {
+  const lines = [
+    "Hi Chef Tye, I'd love to book you for an event.",
+    `Date: ${c.date}`,
+    `Guests: ${c.guests}`,
+  ];
+  if (c.location.trim()) lines.push(`Location: ${c.location.trim()}`);
+  if (c.budget.trim()) lines.push(`Budget: ${c.budget.trim()}`);
+  if (c.details.trim()) lines.push("", c.details.trim());
+  return lines.join("\n");
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Client-side validation so the server's Zod errors never reach the user as raw text (CT-BUG-007). */
+function validationError(s: FormState): string | null {
+  if (!s.name.trim()) return "Please enter your name.";
+  if (!s.email.trim() || !EMAIL_PATTERN.test(s.email.trim())) return "Please enter a valid email address.";
+  if (s.phone.trim() && !isValidPhone(s.phone)) {
+    return "That phone number doesn't look right. Use digits, spaces, +, or ( ) only, or leave it blank.";
+  }
+  if (s.type === "catering") {
+    if (!s.catering.date) return "Please select the event date.";
+    if (!s.catering.guests.trim()) return "Please enter the number of guests.";
+  } else if (!s.message.trim()) {
+    return "Please enter a message.";
+  }
+  return null;
+}
+
+const KNOWN_SAFE_ERROR_MESSAGES = new Set(["Could not send message. Please try again shortly."]);
+
+/** Differentiates connection vs. server errors and never surfaces raw/technical error text (CT-BUG-007). */
+function getSubmitErrorMessage(error: unknown): string {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return "You appear to be offline. Check your connection and try again.";
+  }
+  if (error instanceof TypeError) {
+    // Browsers throw TypeError for fetch-level network failures (DNS, CORS, connection refused, etc.)
+    return "Couldn't reach the server. Check your connection and try again.";
+  }
+  if (error instanceof Error && KNOWN_SAFE_ERROR_MESSAGES.has(error.message)) {
+    return error.message;
+  }
+  return "Something went wrong sending your message. Please try again, or reach us directly using the contact info on this page.";
+}
 
 function ContactPage() {
   const search = Route.useSearch();
@@ -54,7 +108,8 @@ function ContactPage() {
     type: initialType,
     name: "", email: "", phone: "",
     subject: typeMeta[initialType].subject,
-    message: typeMeta[initialType].message,
+    message: "",
+    catering: EMPTY_CATERING,
   });
 
   const submit = useServerFn(submitInquiry);
@@ -62,24 +117,22 @@ function ContactPage() {
     mutationFn: submit,
     onSuccess: () => {
       toast.success("Message sent! Chef Tye's team will respond within 72 hours.");
-      setState((s) => ({ ...s, message: "", subject: typeMeta[s.type].subject }));
+      setState((s) => ({ ...s, message: "", catering: EMPTY_CATERING, subject: typeMeta[s.type].subject }));
     },
-    onError: (e: Error) => toast.error(e.message || "Couldn't send your message — check your details and try again, or reach us directly using the contact info on this page."),
+    onError: (e: unknown) => toast.error(getSubmitErrorMessage(e)),
   });
 
   function setType(t: FormState["type"]) {
-    setState((s) => ({
-      ...s,
-      type: t,
-      subject: typeMeta[t].subject,
-      message: s.message === typeMeta[s.type].message ? typeMeta[t].message : s.message,
-    }));
+    // Deliberately does NOT touch `message` or `catering` — each type keeps its own
+    // independent state so switching tabs never carries text between them (CT-CONTACT-005).
+    setState((s) => ({ ...s, type: t, subject: typeMeta[t].subject }));
   }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (state.phone.trim() && !isValidPhone(state.phone)) {
-      toast.error("That phone number doesn't look right. Use digits, spaces, +, or ( ) only, or leave it blank.");
+    const err = validationError(state);
+    if (err) {
+      toast.error(err);
       return;
     }
     mutation.mutate({
@@ -89,7 +142,7 @@ function ContactPage() {
         email: state.email.trim(),
         phone: state.phone.trim(),
         subject: state.subject.trim(),
-        message: state.message.trim(),
+        message: state.type === "catering" ? buildCateringMessage(state.catering) : state.message.trim(),
       },
     });
   }
@@ -142,9 +195,31 @@ function ContactPage() {
           </div>
 
           <div className="mt-4">
-            <Field label="Message" required>
-              <textarea required rows={6} maxLength={5000} value={state.message} onChange={(e) => setState({ ...state, message: e.target.value })} className="input resize-y" placeholder="Tell Chef Tye what you're planning..." />
-            </Field>
+            {state.type === "catering" ? (
+              <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Event date" required>
+                    <input required type="date" value={state.catering.date} onChange={(e) => setState({ ...state, catering: { ...state.catering, date: e.target.value } })} className="input" />
+                  </Field>
+                  <Field label="Guests" required>
+                    <input required type="number" min={1} value={state.catering.guests} onChange={(e) => setState({ ...state, catering: { ...state.catering, guests: e.target.value } })} className="input" placeholder="e.g. 20" />
+                  </Field>
+                  <Field label="Location (optional)">
+                    <input type="text" maxLength={200} value={state.catering.location} onChange={(e) => setState({ ...state, catering: { ...state.catering, location: e.target.value } })} className="input" placeholder="Venue / address" />
+                  </Field>
+                  <Field label="Budget (optional)">
+                    <input type="text" maxLength={100} value={state.catering.budget} onChange={(e) => setState({ ...state, catering: { ...state.catering, budget: e.target.value } })} className="input" placeholder="e.g. ₦150,000 or flexible" />
+                  </Field>
+                </div>
+                <Field label="Anything else? (optional)">
+                  <textarea rows={4} maxLength={5000} value={state.catering.details} onChange={(e) => setState({ ...state, catering: { ...state.catering, details: e.target.value } })} className="input resize-y" placeholder="Cuisine preferences, dietary needs, occasion..." />
+                </Field>
+              </div>
+            ) : (
+              <Field label="Message" required>
+                <textarea required rows={6} maxLength={5000} value={state.message} onChange={(e) => setState({ ...state, message: e.target.value })} className="input resize-y" placeholder="Tell Chef Tye what you're planning..." />
+              </Field>
+            )}
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
