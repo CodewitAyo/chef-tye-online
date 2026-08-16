@@ -37,7 +37,7 @@ export function Nav() {
       }`}
       style={{ backgroundColor: scrolled ? undefined : "var(--charcoal)" }}
     >
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3 sm:px-8 lg:grid-cols-[minmax(300px,1fr)_auto]">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3 sm:px-8 lg:grid-cols-[minmax(230px,1fr)_auto]">
         <Link to="/" className="flex items-center gap-3 group" onClick={() => setOpen(false)}>
           <img
             src={logoAsset.url}
@@ -46,7 +46,7 @@ export function Nav() {
           />
           <div className="leading-tight">
             <div className="text-display text-xl text-cream sm:text-2xl">CHEF TYE</div>
-            <div className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.25em] text-brand">
+            <div className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.25em] text-brand lg:text-[9px] lg:tracking-[0.12em]">
               Private Chef · Lagos, NG
             </div>
           </div>
@@ -61,7 +61,7 @@ export function Nav() {
               activeOptions={{ exact: l.to === "/" }}
               activeProps={{ className: "text-brand" }}
               inactiveProps={{ className: "text-cream/85" }}
-              className="relative rounded-full px-3 py-2 text-sm font-semibold uppercase tracking-wider transition-colors hover:text-brand"
+              className="relative shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold uppercase tracking-wider transition-colors hover:text-brand"
             >
               {l.label}
             </Link>
@@ -69,19 +69,19 @@ export function Nav() {
           {user ? (
             <Link
               to="/account"
-              className="ml-2 inline-flex items-center gap-2 rounded-full border-2 border-cream/40 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-cream transition-colors hover:border-brand hover:text-brand"
+              className="ml-2 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-2 border-cream/40 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-cream transition-colors hover:border-brand hover:text-brand"
             >
               <UserIcon size={14} /> Account
             </Link>
           ) : (
             <Link
               to="/auth"
-              className="ml-2 inline-flex items-center gap-2 rounded-full border-2 border-cream/40 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-cream transition-colors hover:border-brand hover:text-brand"
+              className="ml-2 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border-2 border-cream/40 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-cream transition-colors hover:border-brand hover:text-brand"
             >
               Sign In
             </Link>
           )}
-          <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="btn-primary ml-2">
+          <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="btn-primary ml-2 shrink-0 whitespace-nowrap">
             Order Now
           </a>
         </nav>
