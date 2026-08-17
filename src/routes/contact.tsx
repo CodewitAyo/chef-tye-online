@@ -123,7 +123,7 @@ function ContactPage() {
   const mutation = useMutation({
     mutationFn: submit,
     onSuccess: () => {
-      toast.success("Message sent! Chef Tye's team will respond within 72 hours.");
+      toast.success("Message sent! Chef Tye's team will try to respond within 72 hours.");
       setState((s) => ({
         ...s,
         general: s.type === "contact" ? EMPTY_GENERAL : s.general,
@@ -170,7 +170,7 @@ function ContactPage() {
             LET'S <span className="text-brand">TALK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Catering, private dinners, brand collabs or press. Drop a message and Chef Tye's team will respond within 72 hours. Looking to support Feed The Streets? Head to the donate page.
+            Catering, private dinners, brand collabs or press. Drop a message and Chef Tye's team will try to respond within 72 hours. Looking to support Feed The Streets? Head to the donate page.
           </p>
         </div>
       </section>
