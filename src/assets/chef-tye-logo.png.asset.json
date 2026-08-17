@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "15077b56-7764-47ae-91c9-2a0253365b7b",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/15077b56-7764-47ae-91c9-2a0253365b7b/chef-tye-logo.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Instagram%20Logo%20Image.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/15077b56-7764-47ae-91c9-2a0253365b7b/chef-tye-logo.png",
   "original_filename": "chef-tye-logo.png",
   "size": 24721,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:31:47Z"
+  "created_at": "2026-07-17T01:31:47Z",
+  "source": "supabase-storage"
 }

@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "32c11298-0f6f-4293-beec-9f85752096b2",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/32c11298-0f6f-4293-beec-9f85752096b2/chef-portrait.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Sitting%20Black%20and%20White%20Portrait%20Image.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/32c11298-0f6f-4293-beec-9f85752096b2/chef-portrait.png",
   "original_filename": "chef-portrait.png",
   "size": 156345,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:31:50Z"
+  "created_at": "2026-07-17T01:31:50Z",
+  "source": "supabase-storage"
 }

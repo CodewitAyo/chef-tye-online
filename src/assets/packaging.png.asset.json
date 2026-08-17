@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "d22e1b0f-8aa7-4b39-92a5-9b110d9f33fd",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/d22e1b0f-8aa7-4b39-92a5-9b110d9f33fd/packaging.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Packaging%20Image.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/d22e1b0f-8aa7-4b39-92a5-9b110d9f33fd/packaging.png",
   "original_filename": "packaging.png",
   "size": 345658,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:32:06Z"
+  "created_at": "2026-07-17T01:32:06Z",
+  "source": "supabase-storage"
 }

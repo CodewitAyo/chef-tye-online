@@ -5,7 +5,7 @@ import {
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import portraitAsset from "@/assets/chef-utensils.png.asset.json";
+import portraitAsset from "@/assets/chef-apron.png.asset.json";
 import round2Asset from "@/assets/round-2.png.asset.json";
 import superstarAsset from "@/assets/superstar-meal.png.asset.json";
 import meal2Asset from "@/assets/meal-2.png.asset.json";

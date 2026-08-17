@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "d2ea99f2-ebe0-425e-b896-cfa4453a823a",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/d2ea99f2-ebe0-425e-b896-cfa4453a823a/meal-2.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Meal%20Image%203.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/d2ea99f2-ebe0-425e-b896-cfa4453a823a/meal-2.png",
   "original_filename": "meal-2.png",
   "size": 633804,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:32:01Z"
+  "created_at": "2026-07-17T01:32:01Z",
+  "source": "supabase-storage"
 }

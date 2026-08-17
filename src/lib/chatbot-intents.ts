@@ -1,12 +1,11 @@
+import { ORDER_URL, WHATSAPP_URL as WHATSAPP } from "@/lib/constants";
+
 export type Intent = {
   id: string;
   match: RegExp;
   answer: string;
   actions?: { label: string; to?: string; href?: string }[];
 };
-
-const ORDER_URL = "https://chowdeck.com/lagos/chef-tye";
-const WHATSAPP = "https://wa.me/2348118615254";
 
 export const INTENTS: Intent[] = [
   {

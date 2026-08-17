@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "f75dea5c-17da-4450-9cbe-4dfdf845a994",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/f75dea5c-17da-4450-9cbe-4dfdf845a994/loyalty.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Loyalty%20Rewards.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/f75dea5c-17da-4450-9cbe-4dfdf845a994/loyalty.png",
   "original_filename": "loyalty.png",
   "size": 327383,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:31:58Z"
+  "created_at": "2026-07-17T01:31:58Z",
+  "source": "supabase-storage"
 }

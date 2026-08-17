@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "03601390-10a2-41a9-9977-77958a9e2e6c",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/03601390-10a2-41a9-9977-77958a9e2e6c/chowdeck.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Chowdeck%20Image%201.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/03601390-10a2-41a9-9977-77958a9e2e6c/chowdeck.png",
   "original_filename": "chowdeck.png",
   "size": 183571,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:31:55Z"
+  "created_at": "2026-07-17T01:31:55Z",
+  "source": "supabase-storage"
 }

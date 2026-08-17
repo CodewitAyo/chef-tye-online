@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "b8bd5335-943e-4a10-adc4-74a87b812e87",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/b8bd5335-943e-4a10-adc4-74a87b812e87/andominus-logo.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Andominus%20CGPT%20Draft%20Concepts%202026-07-09%20v2%20-%20Isolation%201.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/b8bd5335-943e-4a10-adc4-74a87b812e87/andominus-logo.png",
   "original_filename": "andominus-logo.png",
   "size": 1375354,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:31:44Z"
+  "created_at": "2026-07-17T01:31:44Z",
+  "source": "supabase-storage"
 }

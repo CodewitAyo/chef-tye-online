@@ -2,8 +2,9 @@ export const SITE_NAME = "Chef Tye";
 export const SITE_TAGLINE = "Private Chef, Lagos";
 export const SITE_URL = "https://cheftye.lovable.app";
 
-// Ordering platform (Chowdeck) — search page always resolves.
-export const ORDER_URL = "https://chowdeck.com/search?q=Chef%20Tye";
+// Ordering platform (Chowdeck) — general storefront, used for all site-wide
+// "Order Now" CTAs. Per-item deep links are a separate, deferred effort (CT-FUNC-001).
+export const ORDER_URL = "https://chowdeck.com/store/olowora/restaurants/chef-tyexklx4w";
 export const ORDER_PROVIDER_DISPLAY = "Chef Tye on Chowdeck";
 
 // Instagram / X

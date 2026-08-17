@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "0d40ea80-6ec9-4232-8561-03a9ab1cde39",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/0d40ea80-6ec9-4232-8561-03a9ab1cde39/chef-utensils.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Utensils%20Portrait%20Image.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/0d40ea80-6ec9-4232-8561-03a9ab1cde39/chef-utensils.png",
   "original_filename": "chef-utensils.png",
   "size": 156345,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:31:52Z"
+  "created_at": "2026-07-17T01:31:52Z",
+  "source": "supabase-storage"
 }

@@ -2,10 +2,11 @@
   "version": 1,
   "asset_id": "fd201d8f-a75e-4f36-b76d-94cfa24633d5",
   "project_id": "e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9",
-  "url": "/__l5e/assets-v1/fd201d8f-a75e-4f36-b76d-94cfa24633d5/superstar-meal.png",
+  "url": "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/food-images/Chef%20Tye%20Asun%20Pasta%20Image.png",
   "r2_key": "a/v1/e6d58de0-7ce9-47b1-acbd-d0ffb8596bf9/fd201d8f-a75e-4f36-b76d-94cfa24633d5/superstar-meal.png",
   "original_filename": "superstar-meal.png",
   "size": 874677,
   "content_type": "image/png",
-  "created_at": "2026-07-17T01:32:12Z"
+  "created_at": "2026-07-17T01:32:12Z",
+  "source": "supabase-storage"
 }
