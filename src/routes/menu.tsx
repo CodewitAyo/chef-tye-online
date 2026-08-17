@@ -36,7 +36,7 @@ function MenuPage() {
             EAT WELL. <span className="text-brand">RUN IT BACK.</span>
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-cream/80">
-            Prices in Nigerian Naira. Available on Chowdeck (Chef Tye) or direct for catering. The menu shifts a little from time to time.
+            Available on Chowdeck (Chef Tye) or direct for catering. The menu shifts a little from time to time.
           </p>
           <div className="mt-5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-cream/70">
             <Flame size={14} className="text-brand" /> Every meal hand-prepared by Chef Tye himself
