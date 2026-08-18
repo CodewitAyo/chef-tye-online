@@ -55,10 +55,12 @@ export const chatbotAsk = createServerFn({ method: "POST" })
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages, max_tokens: 400 }),
+        body: JSON.stringify({ model: "openai/gpt-oss-120b", messages, max_tokens: 400 }),
       });
       if (!res.ok) {
         if (res.status === 429) return { reply: "Too many questions — try again in a moment." };
+        const errBody = await res.text().catch(() => "");
+        console.error("[chat] groq request failed", res.status, errBody.slice(0, 500));
         return { reply: "Something went wrong on my end. Please try again." };
       }
       const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };
