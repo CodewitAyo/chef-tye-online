@@ -1,8 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Heart, Users, Gift, Sparkles, ArrowRight, Calendar, MapPin, Utensils, HandHeart } from "lucide-react";
-import loyaltyAsset from "@/assets/loyalty.png.asset.json";
-import round2Asset from "@/assets/round-2.png.asset.json";
+const CHARITY_IMG_BASE =
+  "https://fnopenwjlrrbhrisxrxa.supabase.co/storage/v1/object/public/charity-assets/";
+const charityChildHighFive = `${CHARITY_IMG_BASE}Chef%20Tye%20Charity%20Event%20Child%20High%20Five%20Image.png`;
+const charityEventImage1 = `${CHARITY_IMG_BASE}Chef%20Tye%20Charity%20Event%20Image%201.png`;
+const charityLongLine = `${CHARITY_IMG_BASE}Chef%20Tye%20Charity%20Event%20Long%20Line%20Image.png`;
+const charityIceCreamCart = `${CHARITY_IMG_BASE}Chef%20Tye%20Charity%20Event%20Long%20Ice%20Cream%20Cart%20Close.png`;
 
 export const Route = createFileRoute("/charity")({
   head: () => ({
@@ -60,7 +64,7 @@ function CharityPage() {
 
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 md:grid-cols-[1fr_1.2fr]">
         <div className="overflow-hidden rounded-3xl">
-          <img src={round2Asset.url} alt="Chef Tye poster" className="aspect-[3/4] w-full object-cover" />
+          <img src={charityChildHighFive} alt="Chef Tye high-fiving a child at a Feed The Streets event" className="aspect-[3/4] w-full object-cover" />
         </div>
         <div>
           <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Why We Do It</div>
@@ -177,6 +181,22 @@ function CharityPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+        <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">On The Streets</div>
+        <h2 className="mt-2 text-display text-5xl">What a feeding day looks like.</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="overflow-hidden rounded-2xl sm:row-span-2">
+            <img src={charityLongLine} alt="Long line of children waiting for a hot meal at a Chef Tye Feed The Streets event" className="h-full w-full object-cover aspect-[3/4] sm:aspect-auto" />
+          </div>
+          <div className="overflow-hidden rounded-2xl">
+            <img src={charityEventImage1} alt="Chef Tye Feed The Streets charity event" className="aspect-[4/3] w-full object-cover" />
+          </div>
+          <div className="overflow-hidden rounded-2xl">
+            <img src={charityIceCreamCart} alt="Dessert cart serving kids at a Chef Tye charity event" className="aspect-[4/3] w-full object-cover" />
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-5xl px-5 py-16 sm:px-8">
         <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">More Than Money</div>
         <h2 className="mt-2 text-display text-5xl">Other ways you can help.</h2>
@@ -196,24 +216,6 @@ function CharityPage() {
             <p className="mt-2 text-sm text-muted-foreground">In-kind donations of rice, oil, packaging or vehicles work just as well as cash.</p>
             <Link to="/contact" className="btn-outline mt-4 inline-flex">Get in touch</Link>
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-20 sm:px-8 md:grid-cols-[1fr_1fr]">
-        <div className="overflow-hidden rounded-3xl bg-charcoal p-2">
-          <img src={loyaltyAsset.url} alt="Chef Tye Loyalty & Rewards Program" className="w-full rounded-2xl object-cover" />
-        </div>
-        <div>
-          <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">While you're here</div>
-          <h2 className="mt-2 text-display text-5xl">Every order earns points.</h2>
-          <p className="mt-4 text-lg leading-relaxed text-foreground/85">
-            Chef Tye's Loyalty and Rewards Program adds a point for every ₦1,000 you spend. Free plantain and drinks to start, VIP perks as you climb, and a year-end prize for our biggest supporters.
-          </p>
-          <ul className="mt-6 space-y-3 text-sm text-foreground/85">
-            <li><span className="font-bold text-brand">Member (0–99 pts):</span> Free plantain, drinks and member discounts.</li>
-            <li><span className="font-bold text-brand">VIP (100–199 pts):</span> Free main meals, birthday gift, priority orders.</li>
-            <li><span className="font-bold text-brand">Elite Circle (200+ pts):</span> Custom meal requests, exclusive invites, end-of-year prize.</li>
-          </ul>
         </div>
       </section>
     </SiteLayout>

@@ -37,7 +37,7 @@ const askInput = z.object({
 export const chatbotAsk = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => askInput.parse(d))
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return {
         reply:
@@ -50,14 +50,15 @@ export const chatbotAsk = createServerFn({ method: "POST" })
       { role: "user", content: data.message },
     ];
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      // Google's OpenAI-compatible endpoint — free tier via a Google AI Studio key,
+      // no billing required. Same request/response shape as the old Lovable gateway call.
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({ model: "google/gemini-2.5-flash", messages, max_tokens: 400 }),
+        body: JSON.stringify({ model: "gemini-2.5-flash", messages, max_tokens: 400 }),
       });
       if (!res.ok) {
         if (res.status === 429) return { reply: "Too many questions — try again in a moment." };
-        if (res.status === 402) return { reply: "The kitchen's AI credits are running low. Please try again later." };
         return { reply: "Something went wrong on my end. Please try again." };
       }
       const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };

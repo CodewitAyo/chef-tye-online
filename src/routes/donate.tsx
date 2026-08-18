@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Heart, CheckCircle2, ArrowRight, Users, Loader2 } from "lucide-react";
 import { submitInquiry } from "@/lib/inquiries.functions";
-import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "@/lib/constants";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, isValidPhone, sanitizePhoneInput } from "@/lib/constants";
 
 const searchSchema = z.object({
   amount: z.number().int().min(0).max(1_000_000_000).optional(),
@@ -62,6 +62,10 @@ function DonatePage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (phone.trim() && !isValidPhone(phone)) {
+      toast.error("That phone number doesn't look right. Use digits, spaces, +, or ( ) only, or leave it blank.");
+      return;
+    }
     try {
       const parsed = formSchema.parse({
         name: name.trim(),
@@ -173,7 +177,7 @@ function DonatePage() {
             </label>
             <label className="block sm:col-span-2">
               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Phone (optional)</span>
-              <input type="tel" maxLength={40} value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1 w-full rounded-xl border-2 border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand" placeholder="+234…" />
+              <input type="tel" inputMode="tel" maxLength={40} value={phone} onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))} className="mt-1 w-full rounded-xl border-2 border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand" placeholder="+234…" />
             </label>
             <label className="block sm:col-span-2">
               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Note (optional)</span>

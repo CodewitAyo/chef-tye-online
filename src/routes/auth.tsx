@@ -6,7 +6,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { setAuthPersistMode } from "@/lib/auth-storage";
 import { clearAdminToken } from "@/lib/admin-token";
-import { ChefHat, Loader2, Sparkles, ArrowLeft } from "lucide-react";
+import { ChefHat, Loader2, Sparkles, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 const searchSchema = z.object({
   next: z.string().optional(),
@@ -47,6 +47,7 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -143,7 +144,12 @@ function AuthPage() {
               {mode !== "forgot" && (
                 <label className="block">
                   <span className="text-xs font-bold uppercase tracking-widest text-charcoal/70">Password</span>
-                  <input type="password" required minLength={8} maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 w-full rounded-xl border-2 border-charcoal/15 bg-white px-4 py-2.5 text-sm outline-none focus:border-brand" placeholder={mode === "signup" ? "At least 8 characters" : "Your password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+                  <div className="relative mt-1">
+                    <input type={showPassword ? "text" : "password"} required minLength={8} maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border-2 border-charcoal/15 bg-white px-4 py-2.5 pr-11 text-sm outline-none focus:border-brand" placeholder={mode === "signup" ? "At least 8 characters" : "Your password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+                    <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute inset-y-0 right-0 grid w-11 place-items-center text-charcoal/50 hover:text-brand">
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </label>
               )}
 
