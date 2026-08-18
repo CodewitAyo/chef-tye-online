@@ -83,39 +83,49 @@ function CharityPage() {
           <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">How It Works</div>
           <h2 className="mt-2 text-display text-5xl">From your donation to their plate.</h2>
 
-          <ol className="mt-8 grid gap-5 md:grid-cols-4">
-            {[
-              { icon: HandHeart, n: "1", t: "You pledge", d: "Pick an amount or a preset. You get transfer details by email within a day." },
-              { icon: Utensils, n: "2", t: "We shop and cook", d: "100% of donations go to ingredients, packaging and fuel. No overheads, no salaries." },
-              { icon: MapPin, n: "3", t: "We drive out", d: "Every December week we hit different neighbourhoods across Lagos with hot food." },
-              { icon: Calendar, n: "4", t: "You see it", d: "We send updates, photos and totals so you know exactly what your money did." },
-            ].map((s) => (
-              <li key={s.n} className="rounded-3xl border-2 border-charcoal bg-card p-6">
-                <s.icon size={22} className="text-brand" />
-                <div className="mt-3 text-display text-5xl text-brand">{s.n}</div>
-                <div className="mt-1 text-display text-2xl">{s.t}</div>
-                <p className="mt-2 text-sm text-muted-foreground">{s.d}</p>
-              </li>
-            ))}
-          </ol>
+          <div className="mt-8 grid gap-8 md:grid-cols-[1.1fr_1fr] md:items-center">
+            <ol className="grid gap-5 sm:grid-cols-2">
+              {[
+                { icon: HandHeart, n: "1", t: "You pledge", d: "Pick an amount or a preset. You get transfer details by email within a day." },
+                { icon: Utensils, n: "2", t: "We shop and cook", d: "100% of donations go to ingredients, packaging and fuel. No overheads, no salaries." },
+                { icon: MapPin, n: "3", t: "We drive out", d: "Every December week we hit different neighbourhoods across Lagos with hot food." },
+                { icon: Calendar, n: "4", t: "You see it", d: "We send updates, photos and totals so you know exactly what your money did." },
+              ].map((s) => (
+                <li key={s.n} className="rounded-3xl border-2 border-charcoal bg-card p-6">
+                  <s.icon size={22} className="text-brand" />
+                  <div className="mt-3 text-display text-5xl text-brand">{s.n}</div>
+                  <div className="mt-1 text-display text-2xl">{s.t}</div>
+                  <p className="mt-2 text-sm text-muted-foreground">{s.d}</p>
+                </li>
+              ))}
+            </ol>
+            <div className="overflow-hidden rounded-3xl">
+              <img src={charityEventImage1} alt="Chef Tye Feed The Streets charity event" className="aspect-square w-full object-cover" />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Where Your Money Actually Goes</div>
         <h2 className="mt-2 text-display text-5xl">Small amount. Real impact.</h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-          {[
-            { amt: "₦1,000", d: "One hot meal for one child. Rice, protein, sauce, love." },
-            { amt: "₦5,000", d: "Feeds a family of five in one sitting, or five kids on the street." },
-            { amt: "₦15,000", d: "Sponsors a full mini-run: 15 meals plus packaging and transport." },
-            { amt: "₦50,000", d: "Underwrites a whole feeding day for a neighbourhood in Lagos." },
-          ].map((b) => (
-            <div key={b.amt} className="rounded-2xl border-2 border-charcoal bg-card p-5">
-              <div className="text-display text-3xl text-brand">{b.amt}</div>
-              <p className="mt-2 text-sm text-foreground/80">{b.d}</p>
-            </div>
-          ))}
+        <div className="mt-8 grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-center">
+          <div className="overflow-hidden rounded-3xl">
+            <img src={charityIceCreamCart} alt="Dessert cart serving kids at a Chef Tye charity event" className="aspect-square w-full object-cover" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { amt: "₦1,000", d: "One hot meal for one child. Rice, protein, sauce, love." },
+              { amt: "₦5,000", d: "Feeds a family of five in one sitting, or five kids on the street." },
+              { amt: "₦15,000", d: "Sponsors a full mini-run: 15 meals plus packaging and transport." },
+              { amt: "₦50,000", d: "Underwrites a whole feeding day for a neighbourhood in Lagos." },
+            ].map((b) => (
+              <div key={b.amt} className="rounded-2xl border-2 border-charcoal bg-card p-5">
+                <div className="text-display text-3xl text-brand">{b.amt}</div>
+                <p className="mt-2 text-sm text-foreground/80">{b.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <p className="mt-6 text-sm text-muted-foreground">
           Every naira goes to food and getting it out. Chef Tye covers the labour himself, every year, no exceptions.
@@ -123,20 +133,25 @@ function CharityPage() {
       </section>
 
       <section className="bg-charcoal text-cream">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
           <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">Straight From The Streets</div>
           <h2 className="mt-2 text-display text-5xl">Why it matters, in their words.</h2>
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {[
-              { q: "It was the first proper meal I had that week. I still remember the pasta.", a: "12 y/o, Yaba" },
-              { q: "My little brother didn't stop smiling. That's the whole point for me.", a: "Volunteer, 2024 run" },
-              { q: "Chef Tye came himself. Served us. That's not normal.", a: "16 y/o, Surulere" },
-            ].map((t) => (
-              <figure key={t.a} className="rounded-2xl bg-cream/5 p-6 ring-1 ring-cream/10">
-                <blockquote className="text-lg leading-relaxed text-cream/90">"{t.q}"</blockquote>
-                <figcaption className="mt-3 text-xs font-bold uppercase tracking-widest text-brand">— {t.a}</figcaption>
-              </figure>
-            ))}
+          <div className="mt-8 grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-center">
+            <div className="overflow-hidden rounded-3xl">
+              <img src={charityLongLine} alt="Long line of children waiting for a hot meal at a Chef Tye Feed The Streets event" className="aspect-[3/4] w-full object-cover" />
+            </div>
+            <div className="grid gap-5">
+              {[
+                { q: "It was the first proper meal I had that week. I still remember the pasta.", a: "12 y/o, Yaba" },
+                { q: "My little brother didn't stop smiling. That's the whole point for me.", a: "Volunteer, 2024 run" },
+                { q: "Chef Tye came himself. Served us. That's not normal.", a: "16 y/o, Surulere" },
+              ].map((t) => (
+                <figure key={t.a} className="rounded-2xl bg-cream/5 p-6 ring-1 ring-cream/10">
+                  <blockquote className="text-lg leading-relaxed text-cream/90">"{t.q}"</blockquote>
+                  <figcaption className="mt-3 text-xs font-bold uppercase tracking-widest text-brand">— {t.a}</figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -177,22 +192,6 @@ function CharityPage() {
             <p className="mt-4 text-xs uppercase tracking-widest text-cream/60">
               Every meal hand-prepared by Chef Tye himself. Confirmation emailed within 24 hours.
             </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-        <div className="text-xs font-black uppercase tracking-[0.3em] text-brand">On The Streets</div>
-        <h2 className="mt-2 text-display text-5xl">What a feeding day looks like.</h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <div className="overflow-hidden rounded-2xl sm:row-span-2">
-            <img src={charityLongLine} alt="Long line of children waiting for a hot meal at a Chef Tye Feed The Streets event" className="h-full w-full object-cover aspect-[3/4] sm:aspect-auto" />
-          </div>
-          <div className="overflow-hidden rounded-2xl">
-            <img src={charityEventImage1} alt="Chef Tye Feed The Streets charity event" className="aspect-[4/3] w-full object-cover" />
-          </div>
-          <div className="overflow-hidden rounded-2xl">
-            <img src={charityIceCreamCart} alt="Dessert cart serving kids at a Chef Tye charity event" className="aspect-[4/3] w-full object-cover" />
           </div>
         </div>
       </section>

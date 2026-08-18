@@ -37,7 +37,7 @@ const askInput = z.object({
 export const chatbotAsk = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => askInput.parse(d))
   .handler(async ({ data }) => {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return {
         reply:
@@ -50,12 +50,12 @@ export const chatbotAsk = createServerFn({ method: "POST" })
       { role: "user", content: data.message },
     ];
     try {
-      // Google's OpenAI-compatible endpoint — free tier via a Google AI Studio key,
+      // Groq's OpenAI-compatible endpoint — free tier via a Groq Console key,
       // no billing required. Same request/response shape as the old Lovable gateway call.
-      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({ model: "gemini-2.5-flash", messages, max_tokens: 400 }),
+        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages, max_tokens: 400 }),
       });
       if (!res.ok) {
         if (res.status === 429) return { reply: "Too many questions — try again in a moment." };
