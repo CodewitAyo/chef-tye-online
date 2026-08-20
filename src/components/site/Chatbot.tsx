@@ -77,16 +77,22 @@ export function Chatbot() {
 
     let reply: Msg;
     let intentId: string | undefined;
-    // Deterministic intents only answer first-touch questions; after that the AI
-    // handles everything so it keeps full conversation context.
-    const isFirstMessage = messages.filter((m) => m.role === "user").length === 0;
-    const intent = isFirstMessage ? matchIntent(text) : null;
+    // Deterministic intents are checked on every message (not just the first) so a
+    // simple repeat question — "where's the menu?" mid-conversation — still gets the
+    // free instant answer instead of spending a Groq call.
+    const intent = matchIntent(text);
     if (intent) {
       intentId = intent.id;
       reply = { role: "assistant", content: intent.answer, actions: intent.actions };
-
-      intentId = intent.id;
-      reply = { role: "assistant", content: intent.answer, actions: intent.actions };
+    } else if (!user) {
+      // Free-form questions need the AI, which requires a signed-in account for
+      // per-user usage tracking. The input is hidden for signed-out visitors (see
+      // below), so this only fires if a session expires mid-conversation.
+      reply = {
+        role: "assistant",
+        content: "Sign in to keep chatting with me — it only takes a moment.",
+        actions: [{ label: "Sign In", to: "/auth" }],
+      };
     } else {
       try {
         const history = nextMsgs.slice(-8, -1).map((m) => ({ role: m.role, content: m.content }));
@@ -187,29 +193,42 @@ export function Chatbot() {
             )}
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              send();
-            }}
-            className="flex items-center gap-2 border-t border-charcoal/10 bg-white p-3"
-          >
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about the menu, points, catering…"
-              maxLength={500}
-              className="flex-1 rounded-full border border-charcoal/15 bg-white px-4 py-2 text-sm outline-none focus:border-brand"
-            />
-            <button
-              type="submit"
-              disabled={busy || !input.trim()}
-              className="grid h-9 w-9 place-items-center rounded-full bg-brand text-brand-foreground disabled:opacity-50"
-              aria-label="Send"
+          {!authLoading && !user ? (
+            <div className="flex items-center justify-between gap-3 border-t border-charcoal/10 bg-white p-3">
+              <span className="text-xs text-charcoal/60">Sign in to ask me anything</span>
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="rounded-full bg-brand px-4 py-2 text-xs font-bold uppercase tracking-widest text-brand-foreground"
+              >
+                Sign In
+              </Link>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                send();
+              }}
+              className="flex items-center gap-2 border-t border-charcoal/10 bg-white p-3"
             >
-              <Send size={14} />
-            </button>
-          </form>
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about the menu, points, catering…"
+                maxLength={500}
+                className="flex-1 rounded-full border border-charcoal/15 bg-white px-4 py-2 text-sm outline-none focus:border-brand"
+              />
+              <button
+                type="submit"
+                disabled={busy || !input.trim()}
+                className="grid h-9 w-9 place-items-center rounded-full bg-brand text-brand-foreground disabled:opacity-50"
+                aria-label="Send"
+              >
+                <Send size={14} />
+              </button>
+            </form>
+          )}
         </div>
       )}
     </>

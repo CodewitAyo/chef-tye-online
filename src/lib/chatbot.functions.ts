@@ -34,9 +34,22 @@ const askInput = z.object({
     .optional(),
 });
 
+// Per-user daily token budget for the AI chat. Kept well under Groq's free-tier
+// 200,000 tokens/day account-wide cap on openai/gpt-oss-120b so no single visitor
+// can exhaust the shared budget. Resets at midnight UTC, same clock Groq itself uses.
+const DAILY_TOKEN_CAP = 8000;
+const WARNING_THRESHOLD = 0.8;
+const LIMIT_REACHED_REPLY =
+  "You've reached today's chat limit — it resets at midnight UTC. For anything urgent, head to the Contact page and Chef Tye's team will help.";
+
+function utcToday(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export const chatbotAsk = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => askInput.parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return {
@@ -44,6 +57,18 @@ export const chatbotAsk = createServerFn({ method: "POST" })
           "I'm having trouble reaching my brain right now. Try the menu, loyalty or contact pages, or ask again in a moment.",
       };
     }
+
+    const { data: usageRow } = await context.supabase
+      .from("ai_chat_usage")
+      .select("input_tokens, output_tokens")
+      .eq("user_id", context.userId)
+      .eq("usage_date", utcToday())
+      .maybeSingle();
+    const usedTokens = (usageRow?.input_tokens ?? 0) + (usageRow?.output_tokens ?? 0);
+    if (usedTokens >= DAILY_TOKEN_CAP) {
+      return { reply: LIMIT_REACHED_REPLY, limited: true };
+    }
+
     const messages = [
       { role: "system", content: SYSTEM_PROMPT },
       ...(data.history ?? []),
@@ -63,8 +88,28 @@ export const chatbotAsk = createServerFn({ method: "POST" })
         console.error("[chat] groq request failed", res.status, errBody.slice(0, 500));
         return { reply: "Something went wrong on my end. Please try again." };
       }
-      const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-      const reply = body.choices?.[0]?.message?.content?.trim() || "I'm not sure — try the Contact page and Chef Tye's team will help.";
+      const body = (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
+      let reply = body.choices?.[0]?.message?.content?.trim() || "I'm not sure — try the Contact page and Chef Tye's team will help.";
+
+      const inputTokens = body.usage?.prompt_tokens ?? 0;
+      const outputTokens = body.usage?.completion_tokens ?? 0;
+      try {
+        const { data: recorded } = await context.supabase.rpc("record_ai_chat_usage", {
+          _input_tokens: inputTokens,
+          _output_tokens: outputTokens,
+        });
+        const newTotal = recorded?.[0]?.total_tokens_today ?? usedTokens + inputTokens + outputTokens;
+        if (newTotal >= DAILY_TOKEN_CAP * WARNING_THRESHOLD && newTotal < DAILY_TOKEN_CAP) {
+          reply += "\n\nJust a heads up — you're close to today's chat limit.";
+        }
+      } catch (err) {
+        // Never let usage-logging failures block the reply itself.
+        console.error("[chat] usage recording failed", err);
+      }
+
       return { reply };
     } catch (err) {
       console.error("chatbotAsk error", err);

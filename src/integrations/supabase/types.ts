@@ -115,6 +115,36 @@ export type Database = {
           },
         ]
       }
+      ai_chat_usage: {
+        Row: {
+          id: string
+          user_id: string
+          usage_date: string
+          requests: number
+          input_tokens: number
+          output_tokens: number
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          usage_date: string
+          requests?: number
+          input_tokens?: number
+          output_tokens?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          usage_date?: string
+          requests?: number
+          input_tokens?: number
+          output_tokens?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           amount_ngn: number | null
@@ -401,6 +431,10 @@ export type Database = {
         Returns: boolean
       }
       redeem_reward: { Args: { _reward_id: string }; Returns: string }
+      record_ai_chat_usage: {
+        Args: { _input_tokens: number; _output_tokens: number }
+        Returns: { total_tokens_today: number }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"

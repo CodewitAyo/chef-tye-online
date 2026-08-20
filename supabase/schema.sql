@@ -459,3 +459,41 @@ CREATE POLICY "Users insert own conversation messages" ON public.chat_messages F
 DROP POLICY IF EXISTS "Anon insert guest conversation messages" ON public.chat_messages;
 CREATE POLICY "Anon insert guest conversation messages" ON public.chat_messages FOR INSERT TO anon
   WITH CHECK (EXISTS (SELECT 1 FROM public.chat_conversations c WHERE c.id = conversation_id AND c.user_id IS NULL));
+
+-- AI chat usage tracking: per-user daily token budget for the Groq-backed chatbot.
+-- Day is kept in UTC to match Groq's own daily reset (midnight UTC), so a user's
+-- personal cap always refreshes in step with the global free-tier budget.
+CREATE TABLE public.ai_chat_usage (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  usage_date date NOT NULL,
+  requests integer NOT NULL DEFAULT 0,
+  input_tokens integer NOT NULL DEFAULT 0,
+  output_tokens integer NOT NULL DEFAULT 0,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, usage_date)
+);
+ALTER TABLE public.ai_chat_usage ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users read own AI chat usage" ON public.ai_chat_usage FOR SELECT TO authenticated
+  USING (auth.uid() = user_id);
+-- No direct INSERT/UPDATE policy: all writes go through record_ai_chat_usage() below,
+-- so a signed-in user can't tamper with their own counters from the client.
+
+CREATE OR REPLACE FUNCTION public.record_ai_chat_usage(_input_tokens integer, _output_tokens integer)
+RETURNS TABLE (total_tokens_today integer)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE _uid uuid := auth.uid(); _today date := (now() AT TIME ZONE 'utc')::date; _total integer;
+BEGIN
+  IF _uid IS NULL THEN RAISE EXCEPTION 'Not authenticated' USING ERRCODE = '42501'; END IF;
+  INSERT INTO public.ai_chat_usage (user_id, usage_date, requests, input_tokens, output_tokens)
+  VALUES (_uid, _today, 1, GREATEST(_input_tokens, 0), GREATEST(_output_tokens, 0))
+  ON CONFLICT (user_id, usage_date) DO UPDATE SET
+    requests = ai_chat_usage.requests + 1,
+    input_tokens = ai_chat_usage.input_tokens + GREATEST(_input_tokens, 0),
+    output_tokens = ai_chat_usage.output_tokens + GREATEST(_output_tokens, 0),
+    updated_at = now()
+  RETURNING (input_tokens + output_tokens) INTO _total;
+  RETURN QUERY SELECT _total;
+END; $$;
+REVOKE EXECUTE ON FUNCTION public.record_ai_chat_usage(integer, integer) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.record_ai_chat_usage(integer, integer) TO authenticated;
