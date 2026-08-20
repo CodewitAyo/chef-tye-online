@@ -34,95 +34,42 @@ const askInput = z.object({
     .optional(),
 });
 
-type ChatMsg = { role: string; content: string };
-
-type ProviderResult =
-  | { ok: true; reply: string }
-  | { ok: false; status: number; body: string };
-
-/**
- * Calls an OpenAI-compatible chat completions endpoint. Groq and Cerebras both
- * speak this exact shape, so the same helper drives both providers — only the
- * URL, key, and model id differ.
- */
-async function callChatProvider(
-  url: string,
-  apiKey: string,
-  model: string,
-  messages: ChatMsg[],
-): Promise<ProviderResult> {
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({ model, messages, max_tokens: 400 }),
-    });
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => "");
-      return { ok: false, status: res.status, body: errBody.slice(0, 500) };
-    }
-    const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const reply = body.choices?.[0]?.message?.content?.trim();
-    if (!reply) return { ok: false, status: 0, body: "empty completion" };
-    return { ok: true, reply };
-  } catch (err) {
-    return { ok: false, status: 0, body: String(err) };
-  }
-}
-
 export const chatbotAsk = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => askInput.parse(d))
   .handler(async ({ data }) => {
-    const groqKey = process.env.GROQ_API_KEY;
-    const cerebrasKey = process.env.CEREBRAS_API_KEY;
-    if (!groqKey && !cerebrasKey) {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
       return {
         reply:
           "I'm having trouble reaching my brain right now. Try the menu, loyalty or contact pages, or ask again in a moment.",
       };
     }
-    const messages: ChatMsg[] = [
+    const messages = [
       { role: "system", content: SYSTEM_PROMPT },
       ...(data.history ?? []),
       { role: "user", content: data.message },
     ];
-
-    // Groq first — fastest and generous free tier. Cerebras is the backup:
-    // same OpenAI-compatible shape, same gpt-oss-120b model, separate
-    // free-tier quota, so a Groq outage or rate-limit doesn't take the
-    // chatbot down. We fall through on ANY Groq failure (network error,
-    // bad key, 429, deprecated model, etc.) rather than special-casing
-    // individual status codes, since the whole point of a fallback is not
-    // having to enumerate every way the primary provider can fail.
-    let last: ProviderResult | undefined;
-    if (groqKey) {
-      const result = await callChatProvider(
-        "https://api.groq.com/openai/v1/chat/completions",
-        groqKey,
-        "openai/gpt-oss-120b",
-        messages,
-      );
-      if (result.ok) return { reply: result.reply };
-      console.error("[chat] groq failed, trying cerebras", result.status, result.body);
-      last = result;
+    try {
+      // Groq's OpenAI-compatible endpoint — free tier via a Groq Console key,
+      // no billing required. Same request/response shape as the old Lovable gateway call.
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({ model: "openai/gpt-oss-120b", messages, max_tokens: 400 }),
+      });
+      if (!res.ok) {
+        if (res.status === 429) return { reply: "Too many questions — try again in a moment." };
+        const errBody = await res.text().catch(() => "");
+        console.error("[chat] groq request failed", res.status, errBody.slice(0, 500));
+        return { reply: "Something went wrong on my end. Please try again." };
+      }
+      const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+      const reply = body.choices?.[0]?.message?.content?.trim() || "I'm not sure — try the Contact page and Chef Tye's team will help.";
+      return { reply };
+    } catch (err) {
+      console.error("chatbotAsk error", err);
+      return { reply: "I couldn't reach my brain. Please try again in a moment." };
     }
-
-    if (cerebrasKey) {
-      const result = await callChatProvider(
-        "https://api.cerebras.ai/v1/chat/completions",
-        cerebrasKey,
-        "gpt-oss-120b",
-        messages,
-      );
-      if (result.ok) return { reply: result.reply };
-      console.error("[chat] cerebras failed", result.status, result.body);
-      last = result;
-    }
-
-    if (last && !last.ok && last.status === 429) {
-      return { reply: "Too many questions — try again in a moment." };
-    }
-    return { reply: "Something went wrong on my end. Please try again." };
   });
 
 const persistInput = z.object({
