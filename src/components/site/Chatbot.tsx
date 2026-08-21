@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { MessageSquare, X, Send, Loader2, ChefHat } from "lucide-react";
 import { matchIntent } from "@/lib/chatbot-intents";
-import { chatbotAsk, persistChatTurn, loadRecentConversation } from "@/lib/chatbot.functions";
+import { chatbotAsk, persistChatTurn } from "@/lib/chatbot.functions";
 import { useAuth } from "@/lib/use-auth";
 
 
@@ -25,43 +25,53 @@ const GREETING: Msg = {
   ],
 };
 
+// Chat history is kept in sessionStorage rather than restored from the
+// database on mount. sessionStorage is scoped to a single tab and is wiped
+// the moment that tab closes, so a visitor never reopens the site (or the
+// widget) to find a transcript from a previous visit — while a same-tab page
+// refresh still keeps the conversation intact.
+const SESSION_STORAGE_KEY = "superstar-chat-session";
+
+type StoredSession = { conversationId: string | null; messages: Msg[] };
+
+function readStoredSession(): StoredSession | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredSession;
+    if (!Array.isArray(parsed.messages) || parsed.messages.length === 0) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 export function Chatbot() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([GREETING]);
+  const [messages, setMessages] = useState<Msg[]>(() => readStoredSession()?.messages ?? [GREETING]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const conversationIdRef = useRef<string | null>(null);
+  const conversationIdRef = useRef<string | null>(readStoredSession()?.conversationId ?? null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const ask = useServerFn(chatbotAsk);
   const persist = useServerFn(persistChatTurn);
-  const loadRecent = useServerFn(loadRecentConversation);
   const { user, loading: authLoading } = useAuth();
-  const restoredRef = useRef(false);
 
-  // Restore the signed-in member's most recent conversation once per mount.
+  // Persist to this tab's sessionStorage on every change so a page refresh
+  // (not a tab close) keeps the conversation — but never touch the database
+  // to rehydrate an older conversation into a fresh tab.
   useEffect(() => {
-    if (authLoading || !user || restoredRef.current) return;
-    restoredRef.current = true;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await loadRecent();
-        if (cancelled || !res?.conversationId || res.messages.length === 0) return;
-        conversationIdRef.current = res.conversationId;
-        setMessages([
-          GREETING,
-          ...res.messages
-            .filter((m) => m.role === "user" || m.role === "assistant")
-            .map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
-        ]);
-      } catch (err) {
-        console.warn("Chat history restore failed", err);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, authLoading, loadRecent]);
+    if (typeof window === "undefined") return;
+    try {
+      window.sessionStorage.setItem(
+        SESSION_STORAGE_KEY,
+        JSON.stringify({ conversationId: conversationIdRef.current, messages }),
+      );
+    } catch {
+      // Storage can fail (private browsing, quota) — chat still works, just isn't persisted.
+    }
+  }, [messages]);
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({ top: scrollerRef.current.scrollHeight, behavior: "smooth" });
@@ -117,6 +127,19 @@ export function Chatbot() {
         },
       });
       conversationIdRef.current = res.conversationId;
+      // The conversationId lives in a ref (not state), so update this tab's
+      // sessionStorage copy directly here too — the messages-keyed effect
+      // above already ran with the pre-persist (often null) id.
+      if (typeof window !== "undefined") {
+        try {
+          window.sessionStorage.setItem(
+            SESSION_STORAGE_KEY,
+            JSON.stringify({ conversationId: conversationIdRef.current, messages: [...nextMsgs, reply] }),
+          );
+        } catch {
+          // ignore storage failures
+        }
+      }
     } catch (err) {
       console.warn("Chat persistence failed", err);
     }
