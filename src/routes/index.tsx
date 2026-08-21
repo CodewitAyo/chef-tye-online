@@ -10,9 +10,11 @@ import round2Asset from "@/assets/round-2.png.asset.json";
 import superstarAsset from "@/assets/superstar-meal.png.asset.json";
 import meal2Asset from "@/assets/meal-2.png.asset.json";
 import chowdeckAsset from "@/assets/chowdeck.png.asset.json";
+import chowdeck2Asset from "@/assets/chowdeck-2.png.asset.json";
 import lustAsset from "@/assets/lust.png.asset.json";
 import { ORDER_URL, INSTAGRAM_PRIMARY, INSTAGRAM_HANDLE_PRIMARY } from "@/lib/constants";
 import { findMenuItem } from "@/lib/menu-data";
+import { RegularHours } from "@/components/site/RegularHours";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,7 +41,7 @@ const carouselSlides: Slide[] = [
   { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", tag: "Fan Favourite", itemId: "asap" },
   { src: round2Asset.url, alt: "There'll be Round 2 poster", label: "There'll Be Round 2", tag: "The Promise" },
   { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", tag: "Potato Stir-Fry", itemId: "lust" },
-  { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck", tag: "Order Online" },
+  { src: chowdeck2Asset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck", tag: "Order Online" },
 ];
 
 const AUTOPLAY_MS = 4500;
@@ -50,7 +52,7 @@ function MealCarousel() {
     loop: true,
     align: "center",
     duration: 20,
-    dragThreshold: 3,
+    dragThreshold: 12,
     skipSnaps: false,
     containScroll: false,
     watchDrag: true,
@@ -121,29 +123,39 @@ function MealCarousel() {
         className="overflow-hidden rounded-3xl bg-charcoal shadow-2xl [touch-action:pan-y_pinch-zoom] [-webkit-tap-highlight-color:transparent]"
         ref={emblaRef}
       >
-        <div className="flex [backface-visibility:hidden] [touch-action:pan-y_pinch-zoom]">
+        <div className="flex [backface-visibility:hidden] [touch-action:pan-y_pinch-zoom] [will-change:transform] [transform:translateZ(0)]">
           {carouselSlides.map((s) => (
             <div key={s.label} className="relative min-w-0 flex-[0_0_100%] [transform:translate3d(0,0,0)]">
               <div className="aspect-[3/4] w-full overflow-hidden">
                 <img src={s.src} alt={s.alt} draggable={false} className="h-full w-full select-none object-cover" />
               </div>
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/60 to-transparent p-5 text-cream">
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-charcoal via-charcoal/80 to-transparent pt-16 p-5 text-cream">
                 <div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-brand">{s.tag}</div>
-                  <div className="text-display text-2xl leading-tight">{s.label}</div>
+                  <div
+                    className="text-xs font-black uppercase tracking-widest text-brand [-webkit-text-stroke:0.5px_rgba(0,0,0,0.35)]"
+                    style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8), 0 0 12px rgba(0,0,0,0.5)" }}
+                  >
+                    {s.tag}
+                  </div>
+                  <div
+                    className="text-display text-3xl leading-tight sm:text-4xl"
+                    style={{ textShadow: "0 2px 6px rgba(0,0,0,0.85), 0 0 16px rgba(0,0,0,0.5)" }}
+                  >
+                    {s.label}
+                  </div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => emblaApi?.scrollPrev()}
                 aria-label="Previous slide"
-                className="absolute inset-y-0 left-0 w-1/2 cursor-default"
+                className="absolute inset-y-0 left-0 w-1/2 cursor-default [touch-action:pan-y_pinch-zoom] [-webkit-tap-highlight-color:transparent]"
               />
               <button
                 type="button"
                 onClick={() => emblaApi?.scrollNext()}
                 aria-label="Next slide"
-                className="absolute inset-y-0 right-0 w-1/2 cursor-default"
+                className="absolute inset-y-0 right-0 w-1/2 cursor-default [touch-action:pan-y_pinch-zoom] [-webkit-tap-highlight-color:transparent]"
               />
             </div>
           ))}
@@ -165,13 +177,25 @@ function MealCarousel() {
 
 function HomePage() {
   const galleryItems: {
-    src: string; alt: string; label: string; itemId?: string; linkTo?: string; price?: string; short?: string;
+    src: string; alt: string; label: string; itemId?: string; linkTo?: string; href?: string; price?: string; short?: string;
   }[] = [
     { src: superstarAsset.url, alt: "ASAP asun-style pasta", label: "ASAP", itemId: "asap" },
     { src: meal2Asset.url, alt: "Holy Grail pasta", label: "Holy Grail", itemId: "holy-grail" },
-    { src: portraitAsset.url, alt: "Chef Tye portrait", label: "The Chef", linkTo: "/story" },
+    {
+      src: portraitAsset.url,
+      alt: "Chef Tye portrait",
+      label: "The Chef",
+      linkTo: "/story",
+      short: "Learn a bit about the who and why behind Chef Tye.",
+    },
     { src: lustAsset.url, alt: "Lust chicken potato stir-fry", label: "Lust", itemId: "lust" },
-    { src: chowdeckAsset.url, alt: "Chef Tye is now on Chowdeck", label: "Now on Chowdeck" },
+    {
+      src: chowdeckAsset.url,
+      alt: "Chef Tye is now on Chowdeck",
+      label: "Now on Chowdeck",
+      href: ORDER_URL,
+      short: "Order Chef Tye straight to your door.",
+    },
   ].map((it) => {
     const m = findMenuItem(it.itemId);
     return m ? { ...it, price: m.price, short: m.short } : it;
@@ -203,6 +227,9 @@ function HomePage() {
                 {Array.from({ length: 5 }).map((_, i) => (<Star key={i} size={16} fill="currentColor" />))}
               </div>
               <span>Loved on Chowdeck and Instagram</span>
+            </div>
+            <div className="mt-6 max-w-sm">
+              <RegularHours variant="dark" />
             </div>
           </div>
 
@@ -280,7 +307,7 @@ function HomePage() {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-8 lg:grid-cols-3">
             {galleryItems.map((it) => {
-              const isLinked = Boolean(it.itemId || it.linkTo);
+              const isLinked = Boolean(it.itemId || it.linkTo || it.href);
               const inner = (
                 <>
                   <div className="overflow-hidden">
@@ -293,7 +320,7 @@ function HomePage() {
                         <div className="mt-1.5 text-display text-2xl leading-none text-brand">{it.price}</div>
                       )}
                       {it.short && (
-                        <p className="mt-1.5 truncate text-xs text-muted-foreground">{it.short}</p>
+                        <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{it.short}</p>
                       )}
                     </div>
                     {isLinked && (
@@ -308,7 +335,7 @@ function HomePage() {
                     key={it.label}
                     to="/menu"
                     search={{ item: it.itemId }}
-                    className="group block overflow-hidden rounded-2xl bg-card ring-1 ring-border"
+                    className="group block cursor-pointer overflow-hidden rounded-2xl bg-card ring-1 ring-border"
                     aria-label={`See ${it.label} on the menu`}
                   >
                     {inner}
@@ -320,11 +347,25 @@ function HomePage() {
                   <Link
                     key={it.label}
                     to={it.linkTo}
-                    className="group block overflow-hidden rounded-2xl bg-card ring-1 ring-border"
+                    className="group block cursor-pointer overflow-hidden rounded-2xl bg-card ring-1 ring-border"
                     aria-label={`Go to ${it.label}`}
                   >
                     {inner}
                   </Link>
+                );
+              }
+              if (it.href) {
+                return (
+                  <a
+                    key={it.label}
+                    href={it.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block cursor-pointer overflow-hidden rounded-2xl bg-card ring-1 ring-border"
+                    aria-label={`${it.label} — order on Chowdeck`}
+                  >
+                    {inner}
+                  </a>
                 );
               }
               return (

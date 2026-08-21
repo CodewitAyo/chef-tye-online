@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Phone, Mail, MapPin, Bike } from "lucide-react";
+import { Instagram, Phone, Mail, MapPin } from "lucide-react";
 import logoAsset from "@/assets/chef-tye-logo.png.asset.json";
 import andominusAsset from "@/assets/andominus-logo.png.asset.json";
+import chowdeckLogoAsset from "@/assets/chowdeck-logo.png.asset.json";
 import { WhatsappIcon } from "@/components/site/WhatsappIcon";
 import {
   ORDER_URL,
@@ -65,7 +66,7 @@ export function Footer() {
           <h4 className="text-display text-lg text-brand">Order & Follow</h4>
           <ul className="mt-4 space-y-2 text-sm">
             <li className="flex items-center gap-2">
-              <Bike size={14} className="text-brand" />
+              <img src={chowdeckLogoAsset.url} alt="Chowdeck logo" className="h-4 w-4 rounded-sm object-contain" />
               <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="text-cream/80 transition-colors hover:text-brand">
                 Chowdeck — Chef Tye
               </a>

@@ -24,7 +24,7 @@ You can point people to: the Home page, the Menu page, the Join/Loyalty page, th
 
 Feed The Streets is Chef Tye's December charity feeding vulnerable children in Lagos.
 
-Rules: warm, brief, 1–3 short paragraphs. Point people at the right page by name. Never invent prices. Never claim to have performed actions.`;
+Rules: warm, brief, 1–3 short paragraphs. Point people at the right page by name. Never invent prices. Never claim to have performed actions. Write in plain prose only — never use markdown, asterisks, bullet points, or numbered lists (e.g. list menu items as "Holy Grail, ASAP and Obiageli" in a sentence, not as a "*" or "-" list).`;
 
 const askInput = z.object({
   message: z.string().min(1).max(2000),
@@ -93,6 +93,16 @@ export const chatbotAsk = createServerFn({ method: "POST" })
         usage?: { prompt_tokens?: number; completion_tokens?: number };
       };
       let reply = body.choices?.[0]?.message?.content?.trim() || "I'm not sure — try the Contact page and Chef Tye's team will help.";
+      // Groq's model occasionally formats lists as markdown despite instructions —
+      // strip leading "*"/"-" bullet markers and stray asterisks so plain-text
+      // chat bubbles don't show literal "*" characters (e.g. for "what meals do
+      // you offer?").
+      reply = reply
+        .split("\n")
+        .map((line) => line.replace(/^\s*[*\-•]\s+/, ""))
+        .join("\n")
+        .replace(/\*\*/g, "")
+        .replace(/(?<!\w)\*(?!\*)/g, "");
 
       const inputTokens = body.usage?.prompt_tokens ?? 0;
       const outputTokens = body.usage?.completion_tokens ?? 0;

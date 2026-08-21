@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { ShoppingBag, Flame, Star } from "lucide-react";
 import { MENU_ITEMS } from "@/lib/menu-data";
 import { ORDER_URL } from "@/lib/constants";
+import { RegularHours } from "@/components/site/RegularHours";
 
 const searchSchema = z.object({
   item: z.string().max(60).optional(),
@@ -45,6 +46,9 @@ function MenuPage() {
             <a href={ORDER_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
               <ShoppingBag size={16} /> Order on Chowdeck
             </a>
+          </div>
+          <div className="mt-8 max-w-sm">
+            <RegularHours variant="dark" />
           </div>
         </div>
       </section>

@@ -23,6 +23,14 @@ export const LOCATION = "Lagos, Nigeria";
 export const LOCATION_SHORT = "Lagos, NG";
 export const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Lagos%2C+Nigeria";
 
+// Regular menu hours, shown on the Home and Menu pages.
+export const REGULAR_MENU_HOURS: { days: string; hours: string }[] = [
+  { days: "Monday", hours: "10:45 AM – 6:00 PM" },
+  { days: "Tuesday – Friday", hours: "10:45 AM – 5:00 PM" },
+  { days: "Saturday", hours: "10:45 AM – 2:00 PM" },
+  { days: "Sunday", hours: "Closed" },
+];
+
 // Phone fields: digits, spaces, and + - ( ) only, at least 7 digits total.
 export const PHONE_PATTERN = /^[+()\d][\d\s\-()]{6,39}$/;
 export function isValidPhone(value: string): boolean {
