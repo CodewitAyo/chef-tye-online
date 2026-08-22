@@ -11,6 +11,7 @@ export const Route = createFileRoute("/join")({
       { property: "og:title", content: "Join The Chef Tye Elites" },
       { property: "og:description", content: "Chef Tye's loyalty & rewards program. 1 point per ₦1,000 spent, tiers with real perks." },
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/join" }],
   }),
   component: JoinPage,
 });

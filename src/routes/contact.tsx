@@ -32,6 +32,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:description", content: "Book catering, plan a private dinner, or ask about the menu." },
 
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/contact" }],
   }),
   component: ContactPage,
 });

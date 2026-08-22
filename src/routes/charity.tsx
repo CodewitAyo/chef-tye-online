@@ -16,6 +16,7 @@ export const Route = createFileRoute("/charity")({
       { property: "og:title", content: "Feed The Streets — Chef Tye" },
       { property: "og:description", content: "Chef Tye's annual charity feeding vulnerable children across Lagos every December." },
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/charity" }],
   }),
   component: CharityPage,
 });

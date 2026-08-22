@@ -24,6 +24,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Chef Tye — Private Chef in Lagos" },
       { property: "og:description", content: "Chef Tye is a Lagos private chef known for the Holy Grail pasta. Order on Chowdeck, book catering, and support Feed The Streets." },
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/" }],
   }),
   component: HomePage,
 });

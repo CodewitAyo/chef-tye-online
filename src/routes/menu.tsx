@@ -19,6 +19,7 @@ export const Route = createFileRoute("/menu")({
       { property: "og:title", content: "The Menu — Chef Tye" },
       { property: "og:description", content: "Holy Grail, ASAP, Obiageli, Rich Flex, Lust, Ecstasy. The full Chef Tye menu." },
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/menu" }],
   }),
   component: MenuPage,
 });

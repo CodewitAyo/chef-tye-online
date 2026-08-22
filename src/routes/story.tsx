@@ -14,6 +14,7 @@ export const Route = createFileRoute("/story")({
       { property: "og:title", content: "The Story — Chef Tye" },
       { property: "og:description", content: "From university side-hustle to a Lagos kitchen with a loyal following." },
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/story" }],
   }),
   component: StoryPage,
 });

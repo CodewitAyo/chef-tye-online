@@ -22,6 +22,7 @@ export const Route = createFileRoute("/donate")({
       { property: "og:title", content: "Donate — Feed The Streets" },
       { property: "og:description", content: "Every ₦5,000 pledged = 5 hot meals for kids in Lagos." },
     ],
+    links: [{ rel: "canonical", href: "https://chef-tye-online.vercel.app/donate" }],
   }),
   component: DonatePage,
 });
